@@ -1,2 +1,23 @@
-const name = 'Hello World! 1'
-console.log(name)
+import express from 'express'
+import usersRouter from './routes/users.routes'
+import databaseService from './services/database.services'
+
+const app = express()
+const PORT = 4000
+
+app.use(express.json()) //middleware to parse json to object
+
+//routes
+app.get('/', (req, res) => {
+  res.status(200)
+  res.send('Hello World!')
+})
+
+//using routes handler
+app.use('/users', usersRouter) //has to be /user/profile
+
+//run mongoDB
+databaseService.connect().catch(console.dir)
+
+//start the server
+app.listen(PORT, () => console.log(`App listening on port: ${PORT}`))
