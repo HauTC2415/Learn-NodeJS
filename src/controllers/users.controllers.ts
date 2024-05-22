@@ -1,25 +1,23 @@
 import { Request, Response } from 'express'
 import RequestBase from '~/common/Request.base'
+import HTTP_STATUS from '~/constants/httpStatus'
 import USER_MESSAGES from '~/constants/message'
 import { RegisterRequestBody } from '~/models/requests/User.requests'
 import usersService from '~/services/users.services'
 
-export const loginController = (req: Request, res: Response) => {
-  const { email, password } = req.body
-  //query database
-  if (email === 'admin' && password === 'admin') {
-    return res.status(200).json({
-      message: 'User logged in'
-    })
-  }
-  return res.status(400).json({
-    message: 'email or password is incorrect'
+export const loginController = async (req: Request, res: Response) => {
+  throw new Error('Not implemented')
+  const { user } = req as any
+  const rs = await usersService.login(user._id.toString())
+  return res.status(HTTP_STATUS.OK).json({
+    message: USER_MESSAGES.LOGGED_IN,
+    data: rs
   })
 }
 
 export const registerController = async (req: RequestBase<RegisterRequestBody>, res: Response) => {
   const rs = await usersService.register(req.body)
-  return res.status(201).json({
+  return res.status(HTTP_STATUS.CREATED).json({
     message: USER_MESSAGES.REGISTERED,
     data: rs
   })

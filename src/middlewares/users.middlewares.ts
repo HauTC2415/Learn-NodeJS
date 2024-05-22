@@ -8,20 +8,17 @@ import { validate } from '~/utils/validation'
 export const loginValidator = validate(
   checkSchema({
     email: {
-      notEmpty: {
-        errorMessage: 'Email is required'
-      },
       isEmail: {
-        errorMessage: 'Email must be a valid email address'
+        errorMessage: USER_MESSAGES.EMAIL_INVALID_FORMAT
       },
       trim: true
     },
     password: {
-      notEmpty: true,
+      notEmpty: { errorMessage: USER_MESSAGES.PASSWORD_IS_REQUIRED },
       isString: true,
       isLength: {
         options: { min: 6, max: 50 },
-        errorMessage: 'Password must be at least 6 characters long and at most 50 characters long'
+        errorMessage: USER_MESSAGES.PASSWORD_FROM_6_TO_50
       },
       isStrongPassword: {
         options: {
@@ -31,8 +28,21 @@ export const loginValidator = validate(
           minNumbers: 1,
           minSymbols: 1
         },
-        errorMessage:
-          'Password must be at least 6 characters long, and contain at least one lowercase letter, one uppercase letter, one number, and one special character'
+        errorMessage: USER_MESSAGES.STRONG_PASSWORD
+      },
+      custom: {
+        options: async (value, { req }) => {
+          const error = new DefaultError({
+            message: USER_MESSAGES.EMAIL_PASSWORD_INCORRECT,
+            status: HTTP_STATUS.UNAUTHORIZED
+          })
+          const user = await usersService.getUser(req.body.email, value)
+          if (!user) {
+            throw error
+          }
+          req.user = user
+          return true
+        }
       }
     }
   })
@@ -42,11 +52,9 @@ export const loginValidator = validate(
 export const registerValidator = validate(
   checkSchema({
     name: {
-      notEmpty: {
-        errorMessage: USER_MESSAGES.NAME_IS_REQUIRED
-      },
       isLength: {
-        options: { min: 1, max: 100 }
+        options: { min: 1, max: 100 },
+        errorMessage: USER_MESSAGES.NAME_FROM_1_TO_100
       },
       trim: true,
       isString: true
@@ -63,7 +71,7 @@ export const registerValidator = validate(
           }
         }
       },
-      errorMessage: USER_MESSAGES.EMAIL_INVALID
+      errorMessage: USER_MESSAGES.EMAIL_INVALID_FORMAT
     },
     password: {
       notEmpty: true,

@@ -12,8 +12,16 @@ const USER_MESSAGES = {
   PASSWORD_NOT_MATCH: 'Passwords do not match',
   STRONG_PASSWORD:
     'Password must be at least 6 characters long, and contain at least one lowercase letter, one uppercase letter, one number, and one special character',
-  EMAIL_INVALID: 'Email is invalid',
-  NAME_IS_REQUIRED: 'Name is required'
+  PASSWORD_FROM_6_TO_50: 'Password must be at least 6 characters long and at most 50 characters long',
+  EMAIL_INVALID_FORMAT: 'Email must be a valid email address',
+  NAME_IS_REQUIRED: 'Name is required',
+  EMAIL_IS_REQUIRED: 'Email is required',
+  TRIM_NAME: 'Name must not have leading or trailing whitespace',
+  TRIM_EMAIL: 'Email must not have leading or trailing whitespace',
+  PASSWORD_IS_REQUIRED: 'Password is required',
+  INTERNAL_SERVER_ERROR: 'Internal server error',
+  NAME_FROM_1_TO_100: 'Name must be at least 1 character long and at most 100 characters long',
+  EMAIL_PASSWORD_INCORRECT: 'Email or password is incorrect'
 } as const
 
 export default USER_MESSAGES

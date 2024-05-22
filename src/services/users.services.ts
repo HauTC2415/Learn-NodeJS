@@ -13,26 +13,7 @@ class UsersService {
     return createJwtToken({ payload: { user_id, type: TokenType.REFRESH_TOKEN }, tokenType: TokenType.REFRESH_TOKEN })
   }
 
-  async login(data: { email: string; password: string }) {
-    const { email, password } = data
-    if (email === 'admin' && password === 'admin') {
-      return {
-        message: 'User logged in'
-      }
-    }
-    return {
-      message: 'email or password is incorrect'
-    }
-  }
-
-  async register(data: RegisterRequestBody) {
-    const user = new User({
-      ...data,
-      date_of_birth: new Date(data.date_of_birth),
-      password: hashPassword(data.password)
-    })
-    const rs = await databaseService.users.insertOne(user)
-    const user_id = rs.insertedId.toString()
+  private async valueOfRegisterAndLoginSuccess(user_id: string) {
     const [access_token, refresh_token] = await Promise.all([
       this.signAccessToken(user_id),
       this.signRefreshToken(user_id)
@@ -44,9 +25,33 @@ class UsersService {
     }
   }
 
+  async register(data: RegisterRequestBody) {
+    const user = new User({
+      ...data,
+      date_of_birth: new Date(data.date_of_birth),
+      password: hashPassword(data.password)
+    })
+    const rs = await databaseService.users.insertOne(user)
+    const user_id = rs.insertedId.toString()
+
+    const res = await this.valueOfRegisterAndLoginSuccess(user_id)
+    return res
+  }
+
   async checkEmailExist(email: string) {
     const user = await databaseService.users.findOne({ email })
     return user ? true : false
+  }
+
+  async getUser(email: string, rawPassword: string) {
+    const hashPw = hashPassword(rawPassword)
+    const user = await databaseService.users.findOne({ email, password: hashPw })
+    return user
+  }
+
+  async login(user_id: string) {
+    const res = await this.valueOfRegisterAndLoginSuccess(user_id)
+    return res
   }
 }
 

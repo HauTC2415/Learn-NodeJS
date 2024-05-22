@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express'
 import { omit } from 'lodash'
 import HTTP_STATUS from '~/constants/httpStatus'
+import USER_MESSAGES from '~/constants/message'
+import { ErrorWithStatus as BaseError } from '~/models/Errors'
 
 /**
  * Description: Error handler for the application. Maybe call is `default error handler`
@@ -22,7 +24,10 @@ export const wrapRequestHandler = (handler: RequestHandler) => {
     } catch (error) {
       //call next to pass the error to the `error handler`
       //in this case, the error handler is appErrorHandler calling next(error)
-      next(error)
+      if (error instanceof BaseError) {
+        return next(error)
+      }
+      next(new BaseError({ message: USER_MESSAGES.INTERNAL_SERVER_ERROR, status: HTTP_STATUS.INTERNAL_SERVER_ERROR }))
     }
   }
 }
