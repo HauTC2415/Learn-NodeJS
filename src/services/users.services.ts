@@ -20,6 +20,11 @@ class UsersService {
     const rs = await databaseService.users.insertOne(user)
     return rs
   }
+
+  async checkEmailExist(email: string) {
+    const user = await databaseService.users.findOne({ email })
+    return user ? true : false
+  }
 }
 
 const usersService = new UsersService()
