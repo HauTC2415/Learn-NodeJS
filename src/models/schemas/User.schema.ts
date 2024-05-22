@@ -1,17 +1,12 @@
 import { ObjectId } from 'mongodb'
-
-enum UserVerifyStatus {
-  UNVERIFIED,
-  VERIFIED,
-  BLOCKED
-}
+import { UserVerifyStatus } from '~/constants/enum'
 
 interface UserType {
   _id?: ObjectId
-  name?: string
+  name: string
   email: string
   password: string
-  date_of_birth?: Date
+  date_of_birth: Date
   created_at?: Date
   updated_at?: Date
   verify_status?: UserVerifyStatus
@@ -48,10 +43,10 @@ export default class User {
   constructor(user: UserType) {
     const data = new Date()
     this._id = user._id
-    this.name = user.name || ''
+    this.name = user.name
     this.email = user.email
     this.password = user.password
-    this.date_of_birth = user.date_of_birth || new Date()
+    this.date_of_birth = user.date_of_birth
     this.created_at = user.created_at || data
     this.updated_at = user.updated_at || data
     this.verify_status = user.verify_status || UserVerifyStatus.UNVERIFIED

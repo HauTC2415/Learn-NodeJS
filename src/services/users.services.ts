@@ -1,5 +1,6 @@
 import User from '~/models/schemas/User.schema'
 import databaseService from './database.services'
+import { RegisterRequestBody } from '~/models/requests/User.requests'
 
 class UsersService {
   async login(data: { email: string; password: string }) {
@@ -14,9 +15,8 @@ class UsersService {
     }
   }
 
-  async register(data: { email: string; password: string }) {
-    const { email, password } = data
-    const user = new User({ email, password })
+  async register(data: RegisterRequestBody) {
+    const user = new User({ ...data, date_of_birth: new Date(data.date_of_birth) })
     const rs = await databaseService.users.insertOne(user)
     return rs
   }
