@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
+import RequestBase from '~/common/Request.base'
+import USER_MESSAGES from '~/constants/message'
 import { RegisterRequestBody } from '~/models/requests/User.requests'
-import RequestBase from '~/models/requests/common/Request.base'
 import usersService from '~/services/users.services'
 
 export const loginController = (req: Request, res: Response) => {
@@ -17,15 +18,9 @@ export const loginController = (req: Request, res: Response) => {
 }
 
 export const registerController = async (req: RequestBase<RegisterRequestBody>, res: Response) => {
-  try {
-    const rs = await usersService.register(req.body)
-    return res.status(201).json({
-      message: 'register successfully!',
-      data: rs
-    })
-  } catch (error) {
-    return res.status(400).json({
-      message: 'register failed!'
-    })
-  }
+  const rs = await usersService.register(req.body)
+  return res.status(201).json({
+    message: USER_MESSAGES.USER_REGISTERED,
+    data: rs
+  })
 }
