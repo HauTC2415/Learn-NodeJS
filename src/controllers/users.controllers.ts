@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { RegisterRequestBody } from '~/models/requests/User.requests'
-import RequestBase from '~/models/requests/common/request.base'
+import RequestBase from '~/models/requests/common/Request.base'
 import usersService from '~/services/users.services'
 
 export const loginController = (req: Request, res: Response) => {
