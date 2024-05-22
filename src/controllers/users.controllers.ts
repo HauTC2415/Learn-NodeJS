@@ -20,7 +20,7 @@ export const loginController = (req: Request, res: Response) => {
 export const registerController = async (req: RequestBase<RegisterRequestBody>, res: Response) => {
   const rs = await usersService.register(req.body)
   return res.status(201).json({
-    message: USER_MESSAGES.USER_REGISTERED,
+    message: USER_MESSAGES.REGISTERED,
     data: rs
   })
 }

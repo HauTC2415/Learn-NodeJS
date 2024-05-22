@@ -43,7 +43,7 @@ export const registerValidator = validate(
   checkSchema({
     name: {
       notEmpty: {
-        errorMessage: USER_MESSAGES.USER_NAME_IS_REQUIRED
+        errorMessage: USER_MESSAGES.NAME_IS_REQUIRED
       },
       isLength: {
         options: { min: 1, max: 100 }
@@ -59,11 +59,11 @@ export const registerValidator = validate(
         options: async (value) => {
           const isExist = await usersService.checkEmailExist(value)
           if (isExist) {
-            throw new DefaultError({ message: USER_MESSAGES.USER_ALREADY_EXISTS, status: HTTP_STATUS.UNAUTHORIZED })
+            throw new DefaultError({ message: USER_MESSAGES.ALREADY_EXISTS, status: HTTP_STATUS.UNAUTHORIZED })
           }
         }
       },
-      errorMessage: USER_MESSAGES.USER_EMAIL_INVALID
+      errorMessage: USER_MESSAGES.EMAIL_INVALID
     },
     password: {
       notEmpty: true,
@@ -79,7 +79,7 @@ export const registerValidator = validate(
           minNumbers: 1,
           minSymbols: 1
         },
-        errorMessage: USER_MESSAGES.USER_STRONG_PASSWORD
+        errorMessage: USER_MESSAGES.STRONG_PASSWORD
       }
     },
     confirm_password: {
@@ -96,17 +96,17 @@ export const registerValidator = validate(
           minNumbers: 1,
           minSymbols: 1
         },
-        errorMessage: USER_MESSAGES.USER_STRONG_PASSWORD
+        errorMessage: USER_MESSAGES.STRONG_PASSWORD
       },
       custom: {
         options: (value, { req }) => value === req.body.password,
-        errorMessage: USER_MESSAGES.USER_PASSWORD_NOT_MATCH
+        errorMessage: USER_MESSAGES.PASSWORD_NOT_MATCH
       }
     },
     date_of_birth: {
       isISO8601: {
         options: { strict: true, strictSeparator: true },
-        errorMessage: USER_MESSAGES.USER_DATE_OF_BIRTH_INVALID
+        errorMessage: USER_MESSAGES.DATE_OF_BIRTH_INVALID
       }
     }
   })
