@@ -4,6 +4,9 @@ import { RegisterRequestBody } from '~/models/requests/User.requests'
 import { hashPassword } from '~/utils/crypto'
 import { createJwtToken } from '~/utils/jwt'
 import { TokenType } from '~/constants/enum'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
+import { ObjectId } from 'mongodb'
+import { UserResponse } from '~/models/response/User.response'
 
 class UsersService {
   private signAccessToken(user_id: string) {
@@ -22,7 +25,12 @@ class UsersService {
       user_id,
       access_token,
       refresh_token
-    }
+    } as UserResponse
+  }
+
+  private async saveRefreshToken(user_id: string, refresh_token: string) {
+    const refreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+    await databaseService.refreshTokens.insertOne(refreshToken)
   }
 
   async register(data: RegisterRequestBody) {
@@ -34,8 +42,10 @@ class UsersService {
     const rs = await databaseService.users.insertOne(user)
     const user_id = rs.insertedId.toString()
 
-    const res = await this.valueReturnOfRegisterAndLoginSuccess(user_id)
-    return res
+    const userRes = await this.valueReturnOfRegisterAndLoginSuccess(user_id)
+    const { refresh_token } = userRes
+    await this.saveRefreshToken(user_id, refresh_token)
+    return userRes
   }
 
   async checkEmailExist(email: string) {
@@ -50,8 +60,10 @@ class UsersService {
   }
 
   async login(user_id: string) {
-    const res = await this.valueReturnOfRegisterAndLoginSuccess(user_id)
-    return res
+    const userRes = await this.valueReturnOfRegisterAndLoginSuccess(user_id)
+    const { refresh_token } = userRes
+    await this.saveRefreshToken(user_id, refresh_token)
+    return userRes
   }
 }
 

@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken'
 import { TokenType } from '~/constants/enum'
+import configEnv from './config.env'
 
-// process.env.SECRET_KEY as string
 const signToken = ({
   payload,
-  secret_key = process.env.SECRET_KEY as string,
+  secret_key = configEnv.SECRET_KEY as string,
   options
 }: {
   payload: string | object | Buffer
@@ -22,13 +22,13 @@ const signToken = ({
 const getExpiresAt = (tokenType: TokenType) => {
   switch (tokenType) {
     case TokenType.ACCESS_TOKEN:
-      return process.env.EXPIRES_AT
+      return configEnv.EXPIRES_AT
     case TokenType.REFRESH_TOKEN:
-      return process.env.EXPIRES_RT
+      return configEnv.EXPIRES_RT
     case TokenType.FORGOT_PASSWORD_TOKEN:
-      return process.env.EXPIRES_FPT
+      return configEnv.EXPIRES_FPT
     case TokenType.VERIFY_EMAIL_TOKEN:
-      return process.env.EXPIRES_VET
+      return configEnv.EXPIRES_VET
     default:
       throw new Error('Invalid token type')
   }
@@ -45,7 +45,7 @@ export const createJwtToken = async ({
   return await signToken({
     payload,
     options: {
-      algorithm: process.env.ALGORITHM as jwt.Algorithm,
+      algorithm: configEnv.ALGORITHM as jwt.Algorithm,
       expiresIn: expires
     }
   })
@@ -53,7 +53,7 @@ export const createJwtToken = async ({
 
 // export const verifyJwtToken = async (jwtToken: string) => {
 //   return new Promise<object>((resolve, reject) => {
-//     jwt.verify(jwtToken, process.env.SECRET_KEY as string, (err, decoded) => {
+//     jwt.verify(jwtToken, configEnv.SECRET_KEY as string, (err, decoded) => {
 //       if (err) return reject(err)
 //       resolve(decoded as object)
 //     })
