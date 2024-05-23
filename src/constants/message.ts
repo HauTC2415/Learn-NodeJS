@@ -5,7 +5,7 @@ const USER_MESSAGES = {
   REGISTERED_FAILED: 'User registration failed',
   LOGGED_IN: 'User logged in, successfully!',
   LOGGED_IN_FAILED: 'User login failed',
-  LOGGED_OUT: 'User logged out',
+  LOGGED_OUT: 'User logged out, logged out successfully!',
   LOGGED_OUT_FAILED: 'User logout failed',
   UNPROCESSABLE_ENTITY: 'Unprocessable entity',
   DATE_OF_BIRTH_INVALID: 'Date of birth is invalid, please must be in ISO8601 format',
@@ -21,7 +21,12 @@ const USER_MESSAGES = {
   PASSWORD_IS_REQUIRED: 'Password is required',
   INTERNAL_SERVER_ERROR: 'Internal server error',
   NAME_FROM_1_TO_100: 'Name must be at least 1 character long and at most 100 characters long',
-  EMAIL_PASSWORD_INCORRECT: 'Email or password is incorrect'
+  EMAIL_PASSWORD_INCORRECT: 'Email or password is incorrect',
+  INVALID_ACCESS_TOKEN: 'Invalid access token, is not jwt token or expired',
+  ACCESS_TOKEN_REQUIRED: 'Access token is required',
+  REFRESH_TOKEN_REQUIRED: 'Refresh token is required',
+  USED_REFRESH_TOKEN_OR_NOT_FOUND: 'Used refresh token or not found',
+  REFRESH_TOKEN_INVALID: 'Refresh token is invalid, is not jwt token or expired'
 } as const
 
 export default USER_MESSAGES

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { TokenType } from '~/constants/enum'
 import configEnv from './config.env'
+import { PayloadJwtToken, TokenPayload } from '~/models/requests/User.requests'
 
 const signToken = ({
   payload,
@@ -34,13 +35,7 @@ const getExpiresAt = (tokenType: TokenType) => {
   }
 }
 
-export const createJwtToken = async ({
-  payload,
-  tokenType
-}: {
-  payload: string | object | Buffer
-  tokenType: TokenType
-}) => {
+export const createJwtToken = async ({ payload, tokenType }: { payload: PayloadJwtToken; tokenType: TokenType }) => {
   const expires = getExpiresAt(tokenType)
   return await signToken({
     payload,
@@ -51,11 +46,34 @@ export const createJwtToken = async ({
   })
 }
 
-// export const verifyJwtToken = async (jwtToken: string) => {
-//   return new Promise<object>((resolve, reject) => {
-//     jwt.verify(jwtToken, configEnv.SECRET_KEY as string, (err, decoded) => {
-//       if (err) return reject(err)
-//       resolve(decoded as object)
-//     })
-//   })
-// }
+export const verifyAccessToken = async (jwtToken: string) => {
+  return new Promise<TokenPayload>((resolve, reject) => {
+    jwt.verify(
+      jwtToken,
+      configEnv.SECRET_KEY as string,
+      {
+        algorithms: [configEnv.ALGORITHM as jwt.Algorithm]
+      },
+      (err, decoded) => {
+        if (err) return reject(err)
+        resolve(decoded as TokenPayload)
+      }
+    )
+  })
+}
+
+export const verifyRefreshToken = async (jwtToken: string) => {
+  return new Promise<TokenPayload>((resolve, reject) => {
+    jwt.verify(
+      jwtToken,
+      configEnv.SECRET_KEY as string,
+      {
+        algorithms: [configEnv.ALGORITHM as jwt.Algorithm]
+      },
+      (err, decoded) => {
+        if (err) return reject(err)
+        resolve(decoded as TokenPayload)
+      }
+    )
+  })
+}
