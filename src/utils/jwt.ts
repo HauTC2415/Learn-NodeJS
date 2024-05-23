@@ -35,10 +35,27 @@ const getExpiresAt = (tokenType: TokenType) => {
   }
 }
 
+const getSecretKey = (tokenType: TokenType) => {
+  switch (tokenType) {
+    case TokenType.ACCESS_TOKEN:
+      return configEnv.JWT_SECRET_ACCESS_TOKEN_KEY
+    case TokenType.REFRESH_TOKEN:
+      return configEnv.JWT_SECRET_REFRESH_TOKEN_KEY
+    case TokenType.VERIFY_EMAIL_TOKEN:
+      return configEnv.JWT_SECRET_VERIFY_EMAIL_TOKEN_KEY
+    case TokenType.FORGOT_PASSWORD_TOKEN:
+      return configEnv.JWT_SECRET_FORGOT_PASSWORD_TOKEN_KEY
+    default:
+      throw new Error('Invalid token type')
+  }
+}
+
 export const createJwtToken = async ({ payload, tokenType }: { payload: PayloadJwtToken; tokenType: TokenType }) => {
   const expires = getExpiresAt(tokenType)
+  const secret_key = getSecretKey(tokenType)
   return await signToken({
     payload,
+    secret_key: secret_key as string,
     options: {
       algorithm: configEnv.ALGORITHM as jwt.Algorithm,
       expiresIn: expires
@@ -46,27 +63,12 @@ export const createJwtToken = async ({ payload, tokenType }: { payload: PayloadJ
   })
 }
 
-export const verifyAccessToken = async (jwtToken: string) => {
+export const verifyJwtToken = async (jwtToken: string, tokenType: TokenType) => {
+  const secret_key = getSecretKey(tokenType)
   return new Promise<TokenPayload>((resolve, reject) => {
     jwt.verify(
       jwtToken,
-      configEnv.SECRET_KEY as string,
-      {
-        algorithms: [configEnv.ALGORITHM as jwt.Algorithm]
-      },
-      (err, decoded) => {
-        if (err) return reject(err)
-        resolve(decoded as TokenPayload)
-      }
-    )
-  })
-}
-
-export const verifyRefreshToken = async (jwtToken: string) => {
-  return new Promise<TokenPayload>((resolve, reject) => {
-    jwt.verify(
-      jwtToken,
-      configEnv.SECRET_KEY as string,
+      secret_key as string,
       {
         algorithms: [configEnv.ALGORITHM as jwt.Algorithm]
       },

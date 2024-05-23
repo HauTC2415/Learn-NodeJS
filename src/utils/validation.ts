@@ -26,6 +26,7 @@ export const validate = (validation: RunnableValidationChains<ValidationChain>) 
         // pass it to the error handler: call appErrorHandler
         return next(msg)
       }
+      //error 422: entity error
       entityError.errors[errorKey] = errorsObj[errorKey]
     }
     //pass it to the error handler: call appErrorHandler

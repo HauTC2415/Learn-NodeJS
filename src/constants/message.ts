@@ -27,7 +27,11 @@ const USER_MESSAGES = {
   REFRESH_TOKEN_REQUIRED: 'Refresh token is required',
   USED_REFRESH_TOKEN_OR_NOT_FOUND: 'Used refresh token or not found',
   REFRESH_TOKEN_INVALID: 'Refresh token is invalid, is not jwt token or expired',
-  REFRESH_TOKEN_SUCCESS: 'Refresh token successfully'
+  REFRESH_TOKEN_SUCCESS: 'Refresh token successfully',
+  EMAIL_VERIFY_TOKEN_REQUIRED: 'Email verify token is required',
+  EMAIL_VERIFY_TOKEN_SUCCESS: 'Email verify token successfully',
+  EMAIL_VERIFIED_BEFORE: 'Email has been verified before',
+  RESEND_VERIFY_EMAIL_SUCCESS: 'Resend verify email successfully'
 } as const
 
 export default USER_MESSAGES
