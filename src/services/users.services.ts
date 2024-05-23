@@ -13,7 +13,7 @@ class UsersService {
     return createJwtToken({ payload: { user_id, type: TokenType.REFRESH_TOKEN }, tokenType: TokenType.REFRESH_TOKEN })
   }
 
-  private async valueOfRegisterAndLoginSuccess(user_id: string) {
+  private async valueReturnOfRegisterAndLoginSuccess(user_id: string) {
     const [access_token, refresh_token] = await Promise.all([
       this.signAccessToken(user_id),
       this.signRefreshToken(user_id)
@@ -34,7 +34,7 @@ class UsersService {
     const rs = await databaseService.users.insertOne(user)
     const user_id = rs.insertedId.toString()
 
-    const res = await this.valueOfRegisterAndLoginSuccess(user_id)
+    const res = await this.valueReturnOfRegisterAndLoginSuccess(user_id)
     return res
   }
 
@@ -50,7 +50,7 @@ class UsersService {
   }
 
   async login(user_id: string) {
-    const res = await this.valueOfRegisterAndLoginSuccess(user_id)
+    const res = await this.valueReturnOfRegisterAndLoginSuccess(user_id)
     return res
   }
 }

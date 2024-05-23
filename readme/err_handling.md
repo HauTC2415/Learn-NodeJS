@@ -73,3 +73,45 @@ Lỗi validation (UNPROCESSABLE_ENTITY: 422)
   }
 }
 ```
+
+=> Lưu ý thêm: những `error` do hệ thông như undefine.toString(),... Thì k thể dùng JSON.stringify(errorr) để ra error info được vì thuộc tính `enumerable: false` (chi tiết có thể dùng `Object.getOwnPropertyDescriptor(error,"message")` để xem)
+
+Khi đó:
+
+```ts
+res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+    message: err.message,
+    error_info: err
+  })
+
+  =>
+  {
+      "message": "Cannot read properties of undefined (reading 'toString')",
+      "error_info": {}
+  }
+
+```
+
+Như vậy thì error_info sẽ là obj rỗng. do `enumerable: false`. Nên cần đổi là `enumerable: true`
+
+```ts
+Object.getOwnPropertyNames(err).forEach((key) => {
+  Object.defineProperty(err, key, { enumerable: true })
+})
+
+res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+  message: err.message,
+  error_info: err //omit(err, 'stack'): don't show stack in res
+})
+
+==>
+{
+    "message": "Cannot read properties of undefined (reading 'toString')",
+    "error_info": {
+        "stack": "TypeError: Cannot read properties of undefined (reading 'toString')\n    at loginController (/Users/truongconghau/Documents/EduDuocDev/Learn-NodeJS/src/controllers/users.controllers.ts:11:8)\n    at /Users/truongconghau/Documents/EduDuocDev/Learn-NodeJS/src/utils/handlers.ts:40:13\n    at Layer.handle [as handle_request] (/Users/truongconghau/Documents/EduDuocDev/Learn-NodeJS/node_modules/express/lib/router/layer.js:95:5)\n    at next (/Users/truongconghau/Documents/EduDuocDev/Learn-NodeJS/node_modules/express/lib/router/route.js:149:13)\n    at /Users/truongconghau/Documents/EduDuocDev/Learn-NodeJS/src/utils/validation.ts:17:14\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)",
+        "message": "Cannot read properties of undefined (reading 'toString')"
+    }
+}
+```
+
+=> `error_info` không còn là obj rỗng nữa

@@ -3,7 +3,7 @@ const USER_MESSAGES = {
   ALREADY_EXISTS: 'User already exists',
   REGISTERED: 'registered successfully',
   REGISTERED_FAILED: 'User registration failed',
-  LOGGED_IN: 'User logged in',
+  LOGGED_IN: 'User logged in, successfully!',
   LOGGED_IN_FAILED: 'User login failed',
   LOGGED_OUT: 'User logged out',
   LOGGED_OUT_FAILED: 'User logout failed',
