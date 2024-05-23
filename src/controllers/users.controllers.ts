@@ -4,8 +4,8 @@ import ResponseBase from '~/common/Response.base'
 import RequestBase from '~/common/Request.base'
 import HTTP_STATUS from '~/constants/httpStatus'
 import USER_MESSAGES from '~/constants/message'
-import { LogoutRequestBody, RegisterRequestBody } from '~/models/requests/User.requests'
-import { LogoutResponse, RegisterResponse } from '~/models/response/User.response'
+import { LogoutRequestBody, RefreshTokenRequestBody, RegisterRequestBody } from '~/models/requests/User.requests'
+import { LoginResponse, LogoutResponse, RefreshTokenResponse, RegisterResponse } from '~/models/response/User.response'
 import User from '~/models/schemas/User.schema'
 import usersService from '~/services/users.services'
 
@@ -15,7 +15,7 @@ export const loginController = async (req: Request, res: Response) => {
   const user = req.user as User
   const user_id = user._id as ObjectId
   const rs = await usersService.login(user_id.toString())
-  return res.status(HTTP_STATUS.OK).json(new ResponseBase<RegisterResponse>(USER_MESSAGES.LOGGED_IN, rs))
+  return res.status(HTTP_STATUS.OK).json(new ResponseBase<LoginResponse>(USER_MESSAGES.LOGGED_IN, rs))
 }
 
 export const registerController = async (req: RequestBase<RegisterRequestBody>, res: Response) => {
@@ -31,4 +31,12 @@ export const logoutController = async (req: RequestBase<LogoutRequestBody>, res:
   }
   const rs: LogoutResponse = { user_id }
   return res.status(HTTP_STATUS.OK).json(new ResponseBase<LogoutResponse>(USER_MESSAGES.LOGGED_OUT, rs))
+}
+
+export const refreshTokenController = async (req: RequestBase<RefreshTokenRequestBody>, res: Response) => {
+  const refresh_token = req.body.refresh_token
+  const rs = await usersService.refreshToken(refresh_token)
+  return res
+    .status(HTTP_STATUS.OK)
+    .json(new ResponseBase<RefreshTokenResponse>(USER_MESSAGES.REFRESH_TOKEN_SUCCESS, rs))
 }

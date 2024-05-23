@@ -26,7 +26,8 @@ const USER_MESSAGES = {
   ACCESS_TOKEN_REQUIRED: 'Access token is required',
   REFRESH_TOKEN_REQUIRED: 'Refresh token is required',
   USED_REFRESH_TOKEN_OR_NOT_FOUND: 'Used refresh token or not found',
-  REFRESH_TOKEN_INVALID: 'Refresh token is invalid, is not jwt token or expired'
+  REFRESH_TOKEN_INVALID: 'Refresh token is invalid, is not jwt token or expired',
+  REFRESH_TOKEN_SUCCESS: 'Refresh token successfully'
 } as const
 
 export default USER_MESSAGES

@@ -23,3 +23,5 @@ export interface RegisterRequestBody {
 export interface LogoutRequestBody {
   refresh_token: string
 }
+
+export interface RefreshTokenRequestBody extends LogoutRequestBody {}

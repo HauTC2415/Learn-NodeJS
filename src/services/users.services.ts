@@ -92,6 +92,19 @@ class UsersService {
   async logout(refresh_token: string) {
     await databaseService.refreshTokens.deleteOne({ token: refresh_token })
   }
+
+  async refreshToken(refresh_token: string) {
+    const old_refresh_token = (await databaseService.refreshTokens.findOne({ token: refresh_token })) as RefreshToken
+    const user_id = old_refresh_token.user_id.toString()
+
+    const userRes = await this.valueReturnOfRegisterAndLoginSuccess(user_id)
+    const new_refresh_token = userRes.refresh_token
+
+    await this.deleteOldRefreshToken(user_id)
+    await this.saveRefreshToken(user_id, new_refresh_token)
+
+    return userRes
+  }
 }
 
 const usersService = new UsersService()

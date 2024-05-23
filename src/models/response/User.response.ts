@@ -5,6 +5,7 @@ export interface LoginResponse {
 }
 
 export interface RegisterResponse extends LoginResponse {}
+export interface RefreshTokenResponse extends LoginResponse {}
 
 export interface LogoutResponse {
   user_id: string
