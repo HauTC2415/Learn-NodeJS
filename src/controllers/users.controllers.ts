@@ -6,10 +6,13 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import USER_MESSAGES from '~/constants/message'
 import {
   EmailVerifyTokenRequestBody,
+  ForgotPasswordRequestBody,
   LogoutRequestBody,
   RefreshTokenRequestBody,
   RegisterRequestBody,
-  TokenPayload
+  ResetPasswordBodyRequestBody,
+  TokenPayload,
+  VerifyForgotPasswordTokenRequestBody
 } from '~/models/requests/User.requests'
 import {
   EmailVerifyTokenResponse,
@@ -89,4 +92,35 @@ export const resendEmailVerifyTokenController = async (req: Request, res: Respon
   return res
     .status(HTTP_STATUS.OK)
     .json(new ResponseBase<ResendEmailVerifyTokenResponse>(USER_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS, rs))
+}
+
+export const forgotPasswordController = async (req: RequestBase<ForgotPasswordRequestBody>, res: Response) => {
+  const email = req.body.email
+  const { _id } = req.user as User
+  const user_id = (_id as ObjectId).toString()
+  await usersService.forgotPassword(user_id)
+  return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD, { user_id }))
+}
+
+export const verifyForgotPasswordTokenController = async (
+  req: RequestBase<VerifyForgotPasswordTokenRequestBody>,
+  res: Response
+) => {
+  const { user_id } = req.decoded_forgot_password_token as TokenPayload
+  return res
+    .status(HTTP_STATUS.OK)
+    .json(new ResponseBase(USER_MESSAGES.VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS, { user_id }))
+}
+
+export const resetPasswordController = async (req: RequestBase<ResetPasswordBodyRequestBody>, res: Response) => {
+  const { user_id } = req.decoded_forgot_password_token as TokenPayload
+  const { password } = req.body
+  const rs = await usersService.resetPassword(user_id, password)
+  return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.RESET_PASSWORD_SUCCESS, rs))
+}
+
+export const getMeController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const rs = await usersService.me(user_id)
+  return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.LOGGED_IN, rs))
 }

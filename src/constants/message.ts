@@ -31,7 +31,13 @@ const USER_MESSAGES = {
   EMAIL_VERIFY_TOKEN_REQUIRED: 'Email verify token is required',
   EMAIL_VERIFY_TOKEN_SUCCESS: 'Email verify token successfully',
   EMAIL_VERIFIED_BEFORE: 'Email has been verified before',
-  RESEND_VERIFY_EMAIL_SUCCESS: 'Resend verify email successfully'
+  RESEND_VERIFY_EMAIL_SUCCESS: 'Resend verify email successfully',
+  EMAIL_NOT_FOUND: 'Email not found',
+  CHECK_EMAIL_TO_RESET_PASSWORD: 'Check your email to reset password',
+  FORGOT_PASSWORD_TOKEN_REQUIRED: 'Forgot password token is required',
+  INVALID_FORGOT_PASSWORD_TOKEN: 'Invalid forgot password token, is not jwt token or expired',
+  VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS: 'Verify forgot password token successfully',
+  RESET_PASSWORD_SUCCESS: 'Reset password successfully'
 } as const
 
 export default USER_MESSAGES

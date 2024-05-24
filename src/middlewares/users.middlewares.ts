@@ -10,6 +10,8 @@ import { capitalize } from 'lodash'
 import { Request } from 'express'
 import { verifyJwtToken } from '~/utils/jwt'
 import { TokenType } from '~/constants/enum'
+import { ObjectId } from 'mongodb'
+import { confirmPasswordSchema, forgotPassworTokenSchema, passwordSchema } from './common/param.schema.validator'
 
 export const loginValidator = validate(
   checkSchema(
@@ -83,44 +85,8 @@ export const registerValidator = validate(
         },
         errorMessage: USER_MESSAGES.EMAIL_INVALID_FORMAT
       },
-      password: {
-        notEmpty: true,
-        isString: true,
-        isLength: {
-          options: { min: 6, max: 50 }
-        },
-        isStrongPassword: {
-          options: {
-            minLength: 6,
-            minLowercase: 1,
-            minUppercase: 1,
-            minNumbers: 1,
-            minSymbols: 1
-          },
-          errorMessage: USER_MESSAGES.STRONG_PASSWORD
-        }
-      },
-      confirm_password: {
-        notEmpty: true,
-        isString: true,
-        isLength: {
-          options: { min: 6, max: 50 }
-        },
-        isStrongPassword: {
-          options: {
-            minLength: 6,
-            minLowercase: 1,
-            minUppercase: 1,
-            minNumbers: 1,
-            minSymbols: 1
-          },
-          errorMessage: USER_MESSAGES.STRONG_PASSWORD
-        },
-        custom: {
-          options: (value, { req }) => value === req.body.password,
-          errorMessage: USER_MESSAGES.PASSWORD_NOT_MATCH
-        }
-      },
+      password: passwordSchema,
+      confirm_password: confirmPasswordSchema,
       date_of_birth: {
         isISO8601: {
           options: { strict: true, strictSeparator: true },
@@ -239,6 +205,48 @@ export const emailVerifyTokenValidator = validate(
           }
         }
       }
+    },
+    ['body']
+  )
+)
+
+export const forgotPasswordValidator = validate(
+  checkSchema(
+    {
+      email: {
+        isEmail: { errorMessage: USER_MESSAGES.EMAIL_INVALID_FORMAT },
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            const user = await databaseService.users.findOne({ email: value })
+            if (!user) {
+              throw new DefaultError({ message: USER_MESSAGES.NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+            }
+            req.user = user
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
+
+export const verifyForgotPasswordTokenValidator = validate(
+  checkSchema(
+    {
+      forgot_password_token: forgotPassworTokenSchema
+    },
+    ['body']
+  )
+)
+
+export const resetPasswordValidator = validate(
+  checkSchema(
+    {
+      forgot_password_token: forgotPassworTokenSchema,
+      password: passwordSchema,
+      confirm_password: confirmPasswordSchema
     },
     ['body']
   )

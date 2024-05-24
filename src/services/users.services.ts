@@ -32,6 +32,14 @@ class UsersService {
     })
   }
 
+  private signForgotPasswordToken(user_id: string) {
+    const _payload: PayloadJwtToken = { user_id, token_type: TokenType.FORGOT_PASSWORD_TOKEN }
+    return createJwtToken({
+      payload: _payload,
+      tokenType: TokenType.FORGOT_PASSWORD_TOKEN
+    })
+  }
+
   private async userResponse(user_id: string) {
     const [access_token, refresh_token] = await Promise.all([
       this.signAccessToken(user_id),
@@ -157,6 +165,41 @@ class UsersService {
     await this.saveRefreshToken(user_id, refresh_token)
 
     return userRes
+  }
+
+  async forgotPassword(user_id: string) {
+    const forgot_password_token = await this.signForgotPasswordToken(user_id)
+    await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+      {
+        $set: {
+          forgot_password_token,
+          updated_at: '$$NOW'
+        }
+      }
+    ])
+    //TODO: send email: link with forgot_password_token
+  }
+
+  async resetPassword(user_id: string, password: string) {
+    const hashPw = hashPassword(password)
+    await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+      {
+        $set: {
+          password: hashPw,
+          forgot_password_token: '',
+          updated_at: '$$NOW'
+        }
+      }
+    ])
+    return { user_id }
+  }
+
+  async me(user_id: string) {
+    const user = await databaseService.users.findOne(
+      { _id: new ObjectId(user_id) },
+      { projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 } }
+    )
+    return user
   }
 }
 

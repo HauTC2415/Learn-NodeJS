@@ -29,3 +29,17 @@ export interface RefreshTokenRequestBody extends LogoutRequestBody {}
 export interface EmailVerifyTokenRequestBody {
   email_verify_token: string
 }
+
+export interface ForgotPasswordRequestBody {
+  email: string
+}
+
+export interface VerifyForgotPasswordTokenRequestBody {
+  forgot_password_token: string
+}
+
+export interface ResetPasswordBodyRequestBody {
+  forgot_password_token: string
+  password: string
+  confirm_password: string
+}
