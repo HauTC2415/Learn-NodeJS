@@ -28,6 +28,7 @@ import usersService from '~/services/users.services'
 import databaseService from '~/services/database.services'
 import { DefaultError } from '~/models/Errors'
 import { UserVerifyStatus } from '~/constants/enum'
+import { pick } from 'lodash'
 
 export const loginController = async (req: Request, res: Response) => {
   //req.user: req has user property, because of middleware loginValidator defined req.user = user

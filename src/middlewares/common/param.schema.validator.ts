@@ -50,7 +50,7 @@ export const confirmPasswordSchema: ParamSchema = {
   }
 }
 
-export const forgotPassworTokenSchema: ParamSchema = {
+export const forgotPasswordTokenSchema: ParamSchema = {
   trim: true,
   custom: {
     options: async (value, { req }) => {

@@ -54,5 +54,5 @@ export interface UpdateMeRequestBody {
   website?: string
   username?: string
   avatar?: string
-  corver_photo?: string
+  cover_photo?: string
 }

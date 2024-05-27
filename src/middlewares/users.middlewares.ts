@@ -10,7 +10,7 @@ import { capitalize } from 'lodash'
 import { NextFunction, Request, Response } from 'express'
 import { verifyJwtToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
-import { confirmPasswordSchema, forgotPassworTokenSchema, passwordSchema } from './common/param.schema.validator'
+import { confirmPasswordSchema, forgotPasswordTokenSchema, passwordSchema } from './common/param.schema.validator'
 import { TokenPayload } from '~/models/requests/User.requests'
 
 export const loginValidator = validate(
@@ -235,7 +235,7 @@ export const forgotPasswordValidator = validate(
 export const verifyForgotPasswordTokenValidator = validate(
   checkSchema(
     {
-      forgot_password_token: forgotPassworTokenSchema
+      forgot_password_token: forgotPasswordTokenSchema
     },
     ['body']
   )
@@ -244,7 +244,7 @@ export const verifyForgotPasswordTokenValidator = validate(
 export const resetPasswordValidator = validate(
   checkSchema(
     {
-      forgot_password_token: forgotPassworTokenSchema,
+      forgot_password_token: forgotPasswordTokenSchema,
       password: passwordSchema,
       confirm_password: confirmPasswordSchema
     },

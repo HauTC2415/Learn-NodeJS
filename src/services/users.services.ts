@@ -217,8 +217,7 @@ class UsersService {
           $set: {
             // ..._data,
             //TODO: add validator for mongodb schema
-            // ...(_data as UpdateMeRequestBody & { date_of_birth?: Date }),
-            ...data,
+            ...(_data as UpdateMeRequestBody & { date_of_birth?: Date }),
             updated_at: '$$NOW'
           }
         }

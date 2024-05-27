@@ -12,6 +12,7 @@ import {
   updateMeController,
   verifyForgotPasswordTokenController
 } from '~/controllers/users.controllers'
+import { filterFieldsAllowed } from '~/middlewares/common/middlewares'
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
@@ -24,6 +25,7 @@ import {
   verifiedUserValidator,
   verifyForgotPasswordTokenValidator
 } from '~/middlewares/users.middlewares'
+import { UpdateMeRequestBody } from '~/models/requests/User.requests'
 import { wrapRequestHandler } from '~/utils/handlers'
 
 const usersRouter = Router()
@@ -130,6 +132,17 @@ usersRouter.patch(
   accessTokenValidator,
   verifiedUserValidator,
   updateMeValidator,
+  //only pick fields that are allowed to update
+  filterFieldsAllowed<UpdateMeRequestBody>([
+    'name',
+    'date_of_birth',
+    'bio',
+    'location',
+    'website',
+    'username',
+    'avatar',
+    'cover_photo'
+  ]),
   wrapRequestHandler(updateMeController)
 )
 
