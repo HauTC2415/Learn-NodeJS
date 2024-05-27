@@ -7,6 +7,7 @@ import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
 import { UserResponse } from '~/models/response/User.response'
+import Follow from '~/models/schemas/Follower.schema'
 
 class UsersService {
   private signAccessToken({ user_id, verify_status }: { user_id: string; verify_status: UserVerifyStatus }) {
@@ -83,7 +84,8 @@ class UsersService {
       _id: new ObjectId(user_id),
       date_of_birth: new Date(data.date_of_birth),
       password: hashPassword(data.password),
-      email_verify_token: email_verify_token
+      email_verify_token: email_verify_token,
+      username: `user${user_id}`
     })
     await databaseService.users.insertOne(user)
     const userRes = await this.userResponse({ user_id })
@@ -224,8 +226,32 @@ class UsersService {
       ],
       { returnDocument: 'after', projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 } }
     )
-    console.log('first rs', rs)
     return rs
+  }
+
+  async getProfile(username: string) {
+    const user = await databaseService.users.findOne(
+      { username },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          verify_status: 0,
+          updated_at: 0,
+          _id: 0
+        }
+      }
+    )
+    return user
+  }
+
+  async followUser(user_id: string, user_id_follow: string) {
+    const follow = new Follow({ user_id: new ObjectId(user_id), follower_user_id: new ObjectId(user_id_follow) })
+    const rs = await databaseService.followers.insertOne(follow)
+    if (!rs) return null
+    const record = await databaseService.followers.findOne({ _id: rs.insertedId })
+    return record
   }
 }
 

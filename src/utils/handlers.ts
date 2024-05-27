@@ -28,8 +28,8 @@ export const appErrorHandler = (err: any, req: Request, res: Response, next: Nex
  * Description: Wrap the request handler to catch any error, and pass it to the error handler.
  * You doesn't try catch block in the request handler
  */
-export const wrapRequestHandler = (handler: RequestHandler) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+export const wrapRequestHandler = <P>(handler: RequestHandler<P>) => {
+  return async (req: Request<P>, res: Response, next: NextFunction) => {
     try {
       await handler(req, res, next)
     } catch (error) {

@@ -12,6 +12,7 @@ import { verifyJwtToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import { confirmPasswordSchema, forgotPasswordTokenSchema, passwordSchema } from './common/param.schema.validator'
 import { TokenPayload } from '~/models/requests/User.requests'
+import { ObjectId } from 'mongodb'
 
 export const loginValidator = validate(
   checkSchema(
@@ -220,7 +221,7 @@ export const forgotPasswordValidator = validate(
           options: async (value, { req }) => {
             const user = await databaseService.users.findOne({ email: value })
             if (!user) {
-              throw new DefaultError({ message: USER_MESSAGES.NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+              throw new DefaultError({ message: USER_MESSAGES.USER_FOLLOW_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
             }
             req.user = user
             return true
@@ -334,6 +335,30 @@ export const updateMeValidator = validate(
           errorMessage: USER_MESSAGES.LENGTH_FROM_1_TO_400
         },
         trim: true
+      }
+    },
+    ['body']
+  )
+)
+
+export const followUserValidator = validate(
+  checkSchema(
+    {
+      followed_user_id: {
+        notEmpty: { errorMessage: USER_MESSAGES.FOLLOWED_USER_ID_REQUIRED },
+        isString: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!ObjectId.isValid(value)) {
+              throw new DefaultError({ message: USER_MESSAGES.INVALID_FOLLOW_USER_ID, status: HTTP_STATUS.NOT_FOUND })
+            }
+            const hasUser = await databaseService.users.findOne({ _id: new ObjectId(value) })
+            if (!hasUser) {
+              throw new DefaultError({ message: USER_MESSAGES.USER_FOLLOW_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+            }
+            return true
+          }
+        }
       }
     },
     ['body']

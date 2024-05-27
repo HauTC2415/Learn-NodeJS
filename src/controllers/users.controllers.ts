@@ -6,7 +6,9 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import USER_MESSAGES from '~/constants/message'
 import {
   EmailVerifyTokenRequestBody,
+  FollowRequestBody,
   ForgotPasswordRequestBody,
+  GetProfileRequestParams,
   LogoutRequestBody,
   RefreshTokenRequestBody,
   RegisterRequestBody,
@@ -130,5 +132,30 @@ export const updateMeController = async (req: RequestBase<UpdateMeRequestBody>, 
   const { user_id } = req.decoded_authorization as TokenPayload
   const body = req.body
   const rs = await usersService.updateMe(user_id, body)
+  return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.SUCCESS, rs))
+}
+
+export const getProfileController = async (req: Request<GetProfileRequestParams>, res: Response) => {
+  const { username } = req.params
+  const rs = await usersService.getProfile(username)
+
+  if (!rs) {
+    return res.status(HTTP_STATUS.NOT_FOUND).json(new ResponseBase(USER_MESSAGES.NOT_FOUND, null))
+  }
+
+  return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.SUCCESS, rs))
+}
+
+export const followUserController = async (req: RequestBase<FollowRequestBody>, res: Response) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { followed_user_id } = req.body
+  const followExist = await databaseService.followers.findOne({
+    user_id: new ObjectId(user_id),
+    follower_user_id: new ObjectId(followed_user_id)
+  })
+  if (followExist) {
+    return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.USER_IS_FOLLOWED_BEFORE, null))
+  }
+  const rs = await usersService.followUser(user_id, followed_user_id)
   return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.SUCCESS, rs))
 }

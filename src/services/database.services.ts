@@ -2,6 +2,7 @@ import { MongoClient, Db, Collection } from 'mongodb'
 import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import configEnv from '~/utils/config.env'
+import Follow from '~/models/schemas/Follower.schema'
 const uri = `mongodb+srv://${configEnv.DB_USERNAME}:${configEnv.BD_PASSWORD}@twitter.wtyiuov.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 // const client = new MongoClient(uri, {
 //   serverApi: {
@@ -44,6 +45,11 @@ class DatabaseService {
   //get collection refreshTokens
   get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection(configEnv.DB_REFRESH_TOKENS_COLLECTION as string)
+  }
+
+  //get collection followers
+  get followers(): Collection<Follow> {
+    return this.db.collection(configEnv.DB_FOLLOWERS_COLLECTION as string)
   }
 }
 

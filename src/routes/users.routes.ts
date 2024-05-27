@@ -1,8 +1,10 @@
 import { Router } from 'express'
 import {
   emailVerifyTokenController,
+  followUserController,
   forgotPasswordController,
   getMeController,
+  getProfileController,
   loginController,
   logoutController,
   refreshTokenController,
@@ -16,6 +18,7 @@ import { filterFieldsAllowed } from '~/middlewares/common/middlewares'
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
+  followUserValidator,
   forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
@@ -114,7 +117,7 @@ usersRouter.post(
 usersRouter.post('/reset-password', resetPasswordValidator, wrapRequestHandler(resetPasswordController))
 
 /**
- * Description: Get user profile
+ * Description: Get my profile
  * Path: /users/me
  * Method: GET
  * Header: { Authentication: Bearer <AccessToken> }
@@ -144,6 +147,28 @@ usersRouter.patch(
     'cover_photo'
   ]),
   wrapRequestHandler(updateMeController)
+)
+
+/**
+ * Description: Get user profile
+ * Path: /:username
+ * Method: GET
+ */
+usersRouter.get('/:username', wrapRequestHandler(getProfileController))
+
+/**
+ * Description: Follow someone
+ * Path: /users/follow
+ * Method: POST
+ * Header: { Authentication: Bearer <AccessToken> }
+ * Body: { followed_user_id: string }
+ */
+usersRouter.post(
+  '/follow',
+  accessTokenValidator,
+  verifiedUserValidator,
+  followUserValidator,
+  wrapRequestHandler(followUserController)
 )
 
 export default usersRouter

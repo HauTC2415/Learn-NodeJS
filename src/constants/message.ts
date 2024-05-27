@@ -43,7 +43,11 @@ const USER_MESSAGES = {
   MUST_BE_STRING: 'Must be a string',
   LENGTH_FROM_1_TO_200: 'Length must be at least 1 character long and at most 200 characters long',
   LENGTH_FROM_1_TO_400: 'Length must be at least 1 character long and at most 400 characters long',
-  LENGTH_FROM_1_TO_50: 'Length must be at least 1 character long and at most 50 characters long'
+  LENGTH_FROM_1_TO_50: 'Length must be at least 1 character long and at most 50 characters long',
+  FOLLOWED_USER_ID_REQUIRED: 'Followed user id is required',
+  USER_IS_FOLLOWED_BEFORE: 'User is followed before',
+  USER_FOLLOW_NOT_FOUND: 'User follow not found',
+  INVALID_FOLLOW_USER_ID: 'Invalid follow user id'
 } as const
 
 export default USER_MESSAGES
