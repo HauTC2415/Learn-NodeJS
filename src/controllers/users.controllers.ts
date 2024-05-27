@@ -12,6 +12,7 @@ import {
   RegisterRequestBody,
   ResetPasswordBodyRequestBody,
   TokenPayload,
+  UpdateMeRequestBody,
   VerifyForgotPasswordTokenRequestBody
 } from '~/models/requests/User.requests'
 import {
@@ -33,7 +34,7 @@ export const loginController = async (req: Request, res: Response) => {
   //and user has type "User | undefined" because declare for Request of module 'express' in src/type.d.ts
   const user = req.user as User
   const user_id = user._id as ObjectId
-  const rs = await usersService.login(user_id.toString())
+  const rs = await usersService.login({ user_id: user_id.toString(), verify_status: user.verify_status })
   return res.status(HTTP_STATUS.OK).json(new ResponseBase<LoginResponse>(USER_MESSAGES.LOGGED_IN, rs))
 }
 
@@ -54,7 +55,8 @@ export const logoutController = async (req: RequestBase<LogoutRequestBody>, res:
 
 export const refreshTokenController = async (req: RequestBase<RefreshTokenRequestBody>, res: Response) => {
   const refresh_token = req.body.refresh_token
-  const rs = await usersService.refreshToken(refresh_token)
+  const { verify_status } = req.decoded_refresh_token as TokenPayload
+  const rs = await usersService.refreshToken({ refresh_token, verify_status })
   return res
     .status(HTTP_STATUS.OK)
     .json(new ResponseBase<RefreshTokenResponse>(USER_MESSAGES.REFRESH_TOKEN_SUCCESS, rs))
@@ -73,9 +75,7 @@ export const emailVerifyTokenController = async (req: RequestBase<EmailVerifyTok
     return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.EMAIL_VERIFIED_BEFORE, null))
   }
   const rs = await usersService.verifyEmail(user_id)
-  return res
-    .status(HTTP_STATUS.OK)
-    .json(new ResponseBase<EmailVerifyTokenResponse>(USER_MESSAGES.EMAIL_VERIFIED_BEFORE, rs))
+  return res.status(HTTP_STATUS.OK).json(new ResponseBase<EmailVerifyTokenResponse>(USER_MESSAGES.SUCCESS, rs))
 }
 
 export const resendEmailVerifyTokenController = async (req: Request, res: Response) => {
@@ -96,9 +96,9 @@ export const resendEmailVerifyTokenController = async (req: Request, res: Respon
 
 export const forgotPasswordController = async (req: RequestBase<ForgotPasswordRequestBody>, res: Response) => {
   const email = req.body.email
-  const { _id } = req.user as User
+  const { _id, verify_status } = req.user as User
   const user_id = (_id as ObjectId).toString()
-  await usersService.forgotPassword(user_id)
+  await usersService.forgotPassword({ user_id, verify_status })
   return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD, { user_id }))
 }
 
@@ -122,5 +122,12 @@ export const resetPasswordController = async (req: RequestBase<ResetPasswordBody
 export const getMeController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const rs = await usersService.me(user_id)
-  return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.LOGGED_IN, rs))
+  return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.SUCCESS, rs))
+}
+
+export const updateMeController = async (req: RequestBase<UpdateMeRequestBody>, res: Response) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const body = req.body
+  const rs = await usersService.updateMe(user_id, body)
+  return res.status(HTTP_STATUS.OK).json(new ResponseBase(USER_MESSAGES.SUCCESS, rs))
 }

@@ -20,7 +20,7 @@ app.get('/users', (req, res, next) => {
 - Gọi `next()` để chuyển request sang **request handler** tiếp theo
 - Gọi `next(err)` | `throw(...)` để chuyển request sang **error handler** tiếp theo
 
-Khi xảy ra lỗi trong synchronous handler (`đồng bộ`) thì tự động sẽ được chuyển sang **error handler**
+Khi xảy ra lỗi (throw err,...) trong synchronous handler (`đồng bộ`) thì tự động sẽ được chuyển sang **error handler**
 
 Khi xảy ra lỗi trong asynchronous handler (`bất đồng bộ`) thì `bắt buộc` phải gọi `next(err)` để chuyển sang **error handler**
 

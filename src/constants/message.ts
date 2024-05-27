@@ -37,7 +37,13 @@ const USER_MESSAGES = {
   FORGOT_PASSWORD_TOKEN_REQUIRED: 'Forgot password token is required',
   INVALID_FORGOT_PASSWORD_TOKEN: 'Invalid forgot password token, is not jwt token or expired',
   VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS: 'Verify forgot password token successfully',
-  RESET_PASSWORD_SUCCESS: 'Reset password successfully'
+  RESET_PASSWORD_SUCCESS: 'Reset password successfully',
+  USER_NOT_VERIFIED: 'User is not verified',
+  SUCCESS: 'Success',
+  MUST_BE_STRING: 'Must be a string',
+  LENGTH_FROM_1_TO_200: 'Length must be at least 1 character long and at most 200 characters long',
+  LENGTH_FROM_1_TO_400: 'Length must be at least 1 character long and at most 400 characters long',
+  LENGTH_FROM_1_TO_50: 'Length must be at least 1 character long and at most 50 characters long'
 } as const
 
 export default USER_MESSAGES

@@ -7,11 +7,11 @@ import databaseService from '~/services/database.services'
 import usersService from '~/services/users.services'
 import { validate } from '~/utils/validation'
 import { capitalize } from 'lodash'
-import { Request } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { verifyJwtToken } from '~/utils/jwt'
-import { TokenType } from '~/constants/enum'
-import { ObjectId } from 'mongodb'
+import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import { confirmPasswordSchema, forgotPassworTokenSchema, passwordSchema } from './common/param.schema.validator'
+import { TokenPayload } from '~/models/requests/User.requests'
 
 export const loginValidator = validate(
   checkSchema(
@@ -247,6 +247,94 @@ export const resetPasswordValidator = validate(
       forgot_password_token: forgotPassworTokenSchema,
       password: passwordSchema,
       confirm_password: confirmPasswordSchema
+    },
+    ['body']
+  )
+)
+
+export const verifiedUserValidator = (req: Request, res: Response, next: NextFunction) => {
+  const { verify_status } = req.decoded_authorization as TokenPayload
+  if (verify_status !== UserVerifyStatus.VERIFIED) {
+    const error = new DefaultError({ message: USER_MESSAGES.USER_NOT_VERIFIED, status: HTTP_STATUS.FORBIDDEN })
+    return next(error)
+  }
+  next()
+}
+
+export const updateMeValidator = validate(
+  checkSchema(
+    {
+      name: {
+        optional: true,
+        isLength: {
+          options: { min: 1, max: 100 },
+          errorMessage: USER_MESSAGES.NAME_FROM_1_TO_100
+        },
+        isString: true,
+        trim: true
+      },
+      date_of_birth: {
+        optional: true,
+        isISO8601: {
+          options: { strict: true, strictSeparator: true },
+          errorMessage: USER_MESSAGES.DATE_OF_BIRTH_INVALID
+        },
+        trim: true
+      },
+      bio: {
+        optional: true,
+        isString: { errorMessage: USER_MESSAGES.MUST_BE_STRING },
+        isLength: {
+          options: { max: 200, min: 1 },
+          errorMessage: USER_MESSAGES.LENGTH_FROM_1_TO_200
+        },
+        trim: true
+      },
+      location: {
+        optional: true,
+        isString: { errorMessage: USER_MESSAGES.MUST_BE_STRING },
+        isLength: {
+          options: { max: 200, min: 1 },
+          errorMessage: USER_MESSAGES.LENGTH_FROM_1_TO_200
+        },
+        trim: true
+      },
+      website: {
+        optional: true,
+        isString: { errorMessage: USER_MESSAGES.MUST_BE_STRING },
+        isLength: {
+          options: { max: 200, min: 1 },
+          errorMessage: USER_MESSAGES.LENGTH_FROM_1_TO_200
+        },
+        trim: true
+      },
+      username: {
+        optional: true,
+        isString: { errorMessage: USER_MESSAGES.MUST_BE_STRING },
+        isLength: {
+          options: { max: 50, min: 1 },
+          errorMessage: USER_MESSAGES.LENGTH_FROM_1_TO_50
+        },
+        trim: true
+      },
+      avatar: {
+        optional: true,
+        isString: { errorMessage: USER_MESSAGES.MUST_BE_STRING },
+        isLength: {
+          options: { max: 400, min: 1 },
+          errorMessage: USER_MESSAGES.LENGTH_FROM_1_TO_400
+        },
+        trim: true
+      },
+      cover_photo: {
+        optional: true,
+        isString: { errorMessage: USER_MESSAGES.MUST_BE_STRING },
+        isLength: {
+          options: { max: 400, min: 1 },
+          errorMessage: USER_MESSAGES.LENGTH_FROM_1_TO_400
+        },
+        trim: true
+      }
     },
     ['body']
   )
