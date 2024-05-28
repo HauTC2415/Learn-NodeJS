@@ -10,9 +10,16 @@ import { capitalize } from 'lodash'
 import { NextFunction, Request, Response } from 'express'
 import { verifyJwtToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
-import { confirmPasswordSchema, forgotPasswordTokenSchema, passwordSchema } from './common/param.schema.validator'
+import {
+  confirmPasswordSchema,
+  followUserIdSchema,
+  forgotPasswordTokenSchema,
+  passwordSchema
+} from './common/param.schema.validator'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { ObjectId } from 'mongodb'
+import { REGEX_USERNAME } from '~/constants/regex'
+import { hashPassword } from '~/utils/crypto'
 
 export const loginValidator = validate(
   checkSchema(
@@ -312,11 +319,18 @@ export const updateMeValidator = validate(
       username: {
         optional: true,
         isString: { errorMessage: USER_MESSAGES.MUST_BE_STRING },
-        isLength: {
-          options: { max: 50, min: 1 },
-          errorMessage: USER_MESSAGES.LENGTH_FROM_1_TO_50
-        },
-        trim: true
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            if (!REGEX_USERNAME.test(value)) {
+              throw new DefaultError({ message: USER_MESSAGES.INVALID_USERNAME, status: HTTP_STATUS.BAD_REQUEST })
+            }
+            const usernameExist = await usersService.checkUsernameExist(value)
+            if (usernameExist) {
+              throw new DefaultError({ message: USER_MESSAGES.ALREADY_EXISTS, status: HTTP_STATUS.BAD_REQUEST })
+            }
+          }
+        }
       },
       avatar: {
         optional: true,
@@ -344,23 +358,65 @@ export const updateMeValidator = validate(
 export const followUserValidator = validate(
   checkSchema(
     {
-      followed_user_id: {
-        notEmpty: { errorMessage: USER_MESSAGES.FOLLOWED_USER_ID_REQUIRED },
-        isString: true,
-        custom: {
-          options: async (value: string, { req }) => {
-            if (!ObjectId.isValid(value)) {
-              throw new DefaultError({ message: USER_MESSAGES.INVALID_FOLLOW_USER_ID, status: HTTP_STATUS.NOT_FOUND })
-            }
-            const hasUser = await databaseService.users.findOne({ _id: new ObjectId(value) })
-            if (!hasUser) {
-              throw new DefaultError({ message: USER_MESSAGES.USER_FOLLOW_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
-            }
-            return true
-          }
-        }
-      }
+      followed_user_id: followUserIdSchema
     },
     ['body']
   )
+)
+
+export const unFollowUserValidator = validate(
+  checkSchema(
+    {
+      followed_user_id: followUserIdSchema
+    },
+    ['params']
+  )
+)
+
+export const changePasswordValidator = validate(
+  checkSchema({
+    old_password: {
+      notEmpty: true,
+      isString: true,
+      isLength: {
+        options: { min: 6, max: 50 }
+      },
+      custom: {
+        options: async (value: string, { req }) => {
+          const user = await usersService.getUserById(req.decoded_authorization.user_id)
+          if (!user) {
+            throw new DefaultError({ message: USER_MESSAGES.NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+          }
+          const { password } = user
+          const isMatch = hashPassword(value) === password
+          if (!isMatch) {
+            throw new DefaultError({ message: USER_MESSAGES.OLD_PASSWORD_NOT_MATCH, status: HTTP_STATUS.UNAUTHORIZED })
+          }
+          return true
+        }
+      }
+    },
+    new_password: passwordSchema,
+    confirm_password: {
+      notEmpty: true,
+      isString: true,
+      isLength: {
+        options: { min: 6, max: 50 }
+      },
+      isStrongPassword: {
+        options: {
+          minLength: 6,
+          minLowercase: 1,
+          minUppercase: 1,
+          minNumbers: 1,
+          minSymbols: 1
+        },
+        errorMessage: USER_MESSAGES.STRONG_PASSWORD
+      },
+      custom: {
+        options: (value, { req }) => value === req.body.new_password,
+        errorMessage: USER_MESSAGES.PASSWORD_NOT_MATCH
+      }
+    }
+  })
 )

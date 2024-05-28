@@ -87,3 +87,22 @@ export const forgotPasswordTokenSchema: ParamSchema = {
     }
   }
 }
+
+export const followUserIdSchema: ParamSchema = {
+  notEmpty: { errorMessage: USER_MESSAGES.FOLLOWED_USER_ID_REQUIRED },
+  isString: true,
+  custom: {
+    options: async (value: string, { req }) => {
+      if (!ObjectId.isValid(value)) {
+        throw new DefaultError({ message: USER_MESSAGES.INVALID_FOLLOW_USER_ID, status: HTTP_STATUS.NOT_FOUND })
+      }
+      const hasUser = await databaseService.users.findOne({ _id: new ObjectId(value) })
+      if (!hasUser) {
+        throw new DefaultError({ message: USER_MESSAGES.USER_FOLLOW_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+      }
+      return true
+    }
+  }
+}
+
+export const changePasswordSchema: ParamSchema = {}

@@ -1,3 +1,4 @@
+import { unFollowUserController } from './../controllers/users.controllers'
 import User from '~/models/schemas/User.schema'
 import databaseService from './database.services'
 import { PayloadJwtToken, RegisterRequestBody, UpdateMeRequestBody } from '~/models/requests/User.requests'
@@ -252,6 +253,39 @@ class UsersService {
     if (!rs) return null
     const record = await databaseService.followers.findOne({ _id: rs.insertedId })
     return record
+  }
+
+  async unFollowUser(user_id: string, user_id_follow: string) {
+    const rs = await databaseService.followers.deleteOne({
+      user_id: new ObjectId(user_id),
+      follower_user_id: new ObjectId(user_id_follow)
+    })
+    return {
+      user_id,
+      user_id_follow
+    }
+  }
+
+  async checkUsernameExist(username: string) {
+    const user = await databaseService.users.findOne({ username })
+    return user ? true : false
+  }
+
+  async changePassword({ user_id, new_password }: { user_id: string; new_password: string }) {
+    const hashPw = hashPassword(new_password)
+    const rs = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      [
+        {
+          $set: {
+            password: hashPw,
+            updated_at: '$$NOW'
+          }
+        }
+      ],
+      { returnDocument: 'after', projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 } }
+    )
+    return rs
   }
 }
 

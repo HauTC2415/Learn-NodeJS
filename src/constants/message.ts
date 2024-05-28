@@ -47,7 +47,13 @@ const USER_MESSAGES = {
   FOLLOWED_USER_ID_REQUIRED: 'Followed user id is required',
   USER_IS_FOLLOWED_BEFORE: 'User is followed before',
   USER_FOLLOW_NOT_FOUND: 'User follow not found',
-  INVALID_FOLLOW_USER_ID: 'Invalid follow user id'
+  INVALID_FOLLOW_USER_ID: 'Invalid follow user id',
+  USER_IS_NOT_FOLLOWED_BEFORE: 'User is not followed before',
+  UNFOLLOW_SUCCESS: 'Unfollow successfully',
+  INVALID_USERNAME: 'Invalid username',
+  INVALID_REQUEST: 'Invalid request, Can 1 field or more is invalid',
+  OLD_PASSWORD_INCORRECT: 'Old password is incorrect',
+  OLD_PASSWORD_NOT_MATCH: 'Old password does not match'
 } as const
 
 export default USER_MESSAGES
