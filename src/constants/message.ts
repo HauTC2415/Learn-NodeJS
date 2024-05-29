@@ -57,4 +57,11 @@ const USER_MESSAGES = {
   GMAIL_NOT_VERIFIED: 'Gmail is not verified'
 } as const
 
+const MEDIA_MESSAGES = {
+  INVALID_TYPE: 'Invalid file type, is not an image',
+  UPLOAD_SUCCESS: 'Upload image successfully !!!',
+  FILE_IS_REQUIRE_CAN_NOT_NULL: 'File is required, can not be null. Please!!!'
+} as const
+
+export { MEDIA_MESSAGES }
 export default USER_MESSAGES
