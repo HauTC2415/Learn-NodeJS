@@ -1,7 +1,9 @@
 import path from 'path'
 
-const paths = {
-  uploads: path.resolve('uploads')
+const PATHS = {
+  UPLOADS: path.resolve('uploads'),
+  UPLOADS_TEMP: path.resolve('uploads/tmp'),
+  PREFIX_MEDIA: '/medias'
 }
 
-export default paths
+export default PATHS
