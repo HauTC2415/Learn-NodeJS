@@ -42,6 +42,20 @@ class UsersService {
     })
   }
 
+  public async signAccessTokenAndRefreshToken({
+    user_id,
+    verify_status
+  }: {
+    user_id: string
+    verify_status: UserVerifyStatus
+  }) {
+    const [access_token, refresh_token] = await Promise.all([
+      this.signAccessToken({ user_id, verify_status }),
+      this.signRefreshToken({ user_id, verify_status })
+    ])
+    return { access_token, refresh_token }
+  }
+
   private async userResponse({
     user_id,
     verify_status = UserVerifyStatus.UNVERIFIED
@@ -49,10 +63,7 @@ class UsersService {
     user_id: string
     verify_status?: UserVerifyStatus
   }) {
-    const [access_token, refresh_token] = await Promise.all([
-      this.signAccessToken({ user_id, verify_status }),
-      this.signRefreshToken({ user_id, verify_status })
-    ])
+    const { access_token, refresh_token } = await this.signAccessTokenAndRefreshToken({ user_id, verify_status })
     return {
       user_id,
       access_token,
@@ -69,7 +80,7 @@ class UsersService {
     await databaseService.refreshTokens.deleteOne({ user_id: new ObjectId(user_id) })
   }
 
-  private async saveRefreshToken(user_id: string, refresh_token: string) {
+  public async saveRefreshToken(user_id: string, refresh_token: string) {
     const oldRefreshToken = await this.getOldRefreshToken(user_id)
     if (oldRefreshToken) await this.deleteOldRefreshToken(user_id)
     const refreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })

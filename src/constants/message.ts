@@ -53,7 +53,8 @@ const USER_MESSAGES = {
   INVALID_USERNAME: 'Invalid username',
   INVALID_REQUEST: 'Invalid request, Can 1 field or more is invalid',
   OLD_PASSWORD_INCORRECT: 'Old password is incorrect',
-  OLD_PASSWORD_NOT_MATCH: 'Old password does not match'
+  OLD_PASSWORD_NOT_MATCH: 'Old password does not match',
+  GMAIL_NOT_VERIFIED: 'Gmail is not verified'
 } as const
 
 export default USER_MESSAGES
