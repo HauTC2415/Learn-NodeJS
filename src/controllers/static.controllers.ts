@@ -33,7 +33,8 @@ export const serveVideoStreamController = async (req: Request, res: Response) =>
   const chunkSize = 10 ** 6 //1MB
   //get byte start form header range (example: bytes=1234560-)
   const start = Number(range.replace(/\D/g, ''))
-  const end = Math.min(start + chunkSize, videoSize)
+  //videoSize - 1 because start from 0, case choose videoSize is min, always less than videoSize
+  const end = Math.min(start + chunkSize, videoSize - 1)
 
   // Dung lượng thực tế cho mỗi đoạn video stream
   // THường đây sẽ là chunkSize, ngoại trừ đoạn cuối cùng
@@ -65,6 +66,7 @@ export const serveVideoStreamController = async (req: Request, res: Response) =>
    * |0----------------50|51----------------99|100 (end)
    * stream 1: start = 0, end = 50, contentLength = 51
    * stream 2: start = 51, end = 99, contentLength = 49
+   * contentLength of 2 streams = 51 + 49 = 100  === videoSize
    */
   const headers = {
     'Content-Range': `bytes ${start}-${end}/${videoSize}`,
@@ -73,7 +75,6 @@ export const serveVideoStreamController = async (req: Request, res: Response) =>
     'Content-Type': contentType
   }
 
-  console.log(headers)
   res.writeHead(HTTP_STATUS.PARTIAL_CONTENT, headers)
   const videoStreams = fs.createReadStream(videoPath, { start, end })
   videoStreams.pipe(res)
