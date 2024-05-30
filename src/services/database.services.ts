@@ -1,9 +1,10 @@
 import { MongoClient, Db, Collection } from 'mongodb'
 import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
-import configEnv from '~/utils/config.env'
 import Follow from '~/models/schemas/Follower.schema'
-const uri = `mongodb+srv://${configEnv.DB_USERNAME}:${configEnv.BD_PASSWORD}@twitter.wtyiuov.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
+import { getEnv } from '~/utils/config.env'
+
+const uri = `mongodb+srv://${getEnv.DB_USERNAME}:${getEnv.BD_PASSWORD}@twitter.wtyiuov.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 // const client = new MongoClient(uri, {
 //   serverApi: {
 //     version: ServerApiVersion.v1,
@@ -18,7 +19,7 @@ class DatabaseService {
 
   constructor() {
     this.client ??= new MongoClient(uri)
-    this.db = this.client.db(configEnv.DB_NAME)
+    this.db = this.client.db(getEnv.DB_NAME)
   }
 
   async connect() {
@@ -40,16 +41,16 @@ class DatabaseService {
 
   //get collection users
   get users(): Collection<User> {
-    return this.db.collection(configEnv.DB_USERS_COLLECTION as string)
+    return this.db.collection(getEnv.DB_USERS_COLLECTION as string)
   }
   //get collection refreshTokens
   get refreshTokens(): Collection<RefreshToken> {
-    return this.db.collection(configEnv.DB_REFRESH_TOKENS_COLLECTION as string)
+    return this.db.collection(getEnv.DB_REFRESH_TOKENS_COLLECTION as string)
   }
 
   //get collection followers
   get followers(): Collection<Follow> {
-    return this.db.collection(configEnv.DB_FOLLOWERS_COLLECTION as string)
+    return this.db.collection(getEnv.DB_FOLLOWERS_COLLECTION as string)
   }
 }
 

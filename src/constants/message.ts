@@ -58,10 +58,13 @@ const USER_MESSAGES = {
 } as const
 
 const MEDIA_MESSAGES = {
-  INVALID_TYPE: 'Invalid file type, is not an image',
+  INVALID_UPLOAD_SINGLE_IMAGE_TYPE: "Invalid file type, field name must be 'image' and must be image type",
+  INVALID_UPLOAD_MULTI_IMAGES_TYPE: "Invalid file type, field name must be 'images' and must be image type",
   UPLOAD_SUCCESS: 'Upload image successfully !!!',
   FILE_IS_REQUIRE_CAN_NOT_NULL: 'File is required, can not be null. Please!!!',
-  FILE_NOT_FOUND: 'File not found'
+  FILE_NOT_FOUND: 'File not found',
+  FILES_IS_EMPTY: 'Files is empty',
+  REQUIRES_RANGE_HEADER: 'Requires Range header'
 } as const
 
 export { MEDIA_MESSAGES }

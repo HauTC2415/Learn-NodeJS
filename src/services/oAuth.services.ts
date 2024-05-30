@@ -1,4 +1,3 @@
-import configEnv from '~/utils/config.env'
 import axios from 'axios'
 import { DefaultError } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
@@ -6,18 +5,19 @@ import USER_MESSAGES from '~/constants/message'
 import usersService from './users.services'
 import databaseService from './database.services'
 import { UserVerifyStatus } from '~/constants/enum'
+import { getEnv } from '~/utils/config.env'
 
 class OAuthService {
   private async getOAuthGoogleToken(code: string) {
     const body = {
       code,
-      client_id: configEnv.GOOGLE_CLIENT_ID,
-      client_secret: configEnv.GOOGLE_CLIENT_SECRET,
-      redirect_uri: configEnv.GOOGLE_REDIRECT_URI,
+      client_id: getEnv.GOOGLE_CLIENT_ID,
+      client_secret: getEnv.GOOGLE_CLIENT_SECRET,
+      redirect_uri: getEnv.GOOGLE_REDIRECT_URI,
       grant_type: 'authorization_code'
     }
 
-    const response = await axios.post(configEnv.GOOGLE_OAUTH_TOKEN_URL as string, body, {
+    const response = await axios.post(getEnv.GOOGLE_OAUTH_TOKEN_URL as string, body, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
@@ -26,7 +26,7 @@ class OAuthService {
   }
 
   private async getOAuthGoogleUserInfo(access_token: string, id_token: string) {
-    const response = await axios.get(configEnv.GOOGLE_OAUTH_USERINFO_URL as string, {
+    const response = await axios.get(getEnv.GOOGLE_OAUTH_USERINFO_URL as string, {
       headers: {
         Authorization: `Bearer ${access_token}`
       },

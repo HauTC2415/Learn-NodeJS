@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { TokenType } from '~/constants/enum'
-import configEnv from './config.env'
+import { getEnv } from './config.env'
 import { PayloadJwtToken, TokenPayload } from '~/models/requests/User.requests'
 
 const signToken = ({
   payload,
-  secret_key = configEnv.SECRET_KEY as string,
+  secret_key = getEnv.SECRET_KEY as string,
   options
 }: {
   payload: string | object | Buffer
@@ -23,13 +23,13 @@ const signToken = ({
 const getExpiresAt = (tokenType: TokenType) => {
   switch (tokenType) {
     case TokenType.ACCESS_TOKEN:
-      return configEnv.EXPIRES_AT
+      return getEnv.EXPIRES_AT
     case TokenType.REFRESH_TOKEN:
-      return configEnv.EXPIRES_RT
+      return getEnv.EXPIRES_RT
     case TokenType.FORGOT_PASSWORD_TOKEN:
-      return configEnv.EXPIRES_FPT
+      return getEnv.EXPIRES_FPT
     case TokenType.VERIFY_EMAIL_TOKEN:
-      return configEnv.EXPIRES_VET
+      return getEnv.EXPIRES_VET
     default:
       throw new Error('Invalid token type')
   }
@@ -38,13 +38,13 @@ const getExpiresAt = (tokenType: TokenType) => {
 const getSecretKey = (tokenType: TokenType) => {
   switch (tokenType) {
     case TokenType.ACCESS_TOKEN:
-      return configEnv.JWT_SECRET_ACCESS_TOKEN_KEY
+      return getEnv.JWT_SECRET_ACCESS_TOKEN_KEY
     case TokenType.REFRESH_TOKEN:
-      return configEnv.JWT_SECRET_REFRESH_TOKEN_KEY
+      return getEnv.JWT_SECRET_REFRESH_TOKEN_KEY
     case TokenType.VERIFY_EMAIL_TOKEN:
-      return configEnv.JWT_SECRET_VERIFY_EMAIL_TOKEN_KEY
+      return getEnv.JWT_SECRET_VERIFY_EMAIL_TOKEN_KEY
     case TokenType.FORGOT_PASSWORD_TOKEN:
-      return configEnv.JWT_SECRET_FORGOT_PASSWORD_TOKEN_KEY
+      return getEnv.JWT_SECRET_FORGOT_PASSWORD_TOKEN_KEY
     default:
       throw new Error('Invalid token type')
   }
@@ -57,7 +57,7 @@ export const createJwtToken = async ({ payload, tokenType }: { payload: PayloadJ
     payload,
     secret_key: secret_key as string,
     options: {
-      algorithm: configEnv.ALGORITHM as jwt.Algorithm,
+      algorithm: getEnv.ALGORITHM as jwt.Algorithm,
       expiresIn: expires
     }
   })
@@ -70,7 +70,7 @@ export const verifyJwtToken = async (jwtToken: string, tokenType: TokenType) => 
       jwtToken,
       secret_key as string,
       {
-        algorithms: [configEnv.ALGORITHM as jwt.Algorithm]
+        algorithms: [getEnv.ALGORITHM as jwt.Algorithm]
       },
       (err, decoded) => {
         if (err) return reject(err)

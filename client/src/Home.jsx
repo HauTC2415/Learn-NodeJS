@@ -51,6 +51,10 @@ export default function HomePage() {
           <Link to={googleOAuthUrl}>Login with Google</Link>
         )}
       </p>
+      <video controls width={500}>
+        {/* <source src='http://localhost:4000/medias/videos/ce87c6f13a427e73b32fbb900.mp4' type='video/mp4' /> */}
+        <source src='http://localhost:4000/medias/videos-stream/ce87c6f13a427e73b32fbb900.mp4' type='video/mp4' />
+      </video>
     </>
   )
 }
