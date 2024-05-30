@@ -60,7 +60,8 @@ const USER_MESSAGES = {
 const MEDIA_MESSAGES = {
   INVALID_TYPE: 'Invalid file type, is not an image',
   UPLOAD_SUCCESS: 'Upload image successfully !!!',
-  FILE_IS_REQUIRE_CAN_NOT_NULL: 'File is required, can not be null. Please!!!'
+  FILE_IS_REQUIRE_CAN_NOT_NULL: 'File is required, can not be null. Please!!!',
+  FILE_NOT_FOUND: 'File not found'
 } as const
 
 export { MEDIA_MESSAGES }

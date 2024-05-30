@@ -7,6 +7,7 @@ import mediasRouter from './routes/medias.routes'
 import { initUploadsTempFolder } from './utils/file'
 import configEnv from './utils/config.env'
 import PATHS from './constants/paths'
+import staticRouter from './routes/static.routes'
 
 const app = express()
 const PORT = configEnv.PORT as string | 4000
@@ -30,8 +31,9 @@ app.use('/medias', mediasRouter)
 //serve static files
 // app.use(express.static(PATHS.UPLOADS))
 //=> http://localhost:4000/aa3ed3b0dc3a9566305aa3600.jpeg
-app.use(PATHS.PREFIX_MEDIA, express.static(PATHS.UPLOADS))
+// app.use(PATHS.PREFIX_MEDIA, express.static(PATHS.UPLOADS))
 //=> http://localhost:4000/medias/aa3ed3b0dc3a9566305aa3600.jpeg
+app.use(PATHS.PREFIX_MEDIA, staticRouter)
 
 //run mongoDB
 databaseService.connect().catch(console.dir)
