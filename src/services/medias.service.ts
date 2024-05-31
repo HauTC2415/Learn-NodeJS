@@ -13,7 +13,7 @@ import {
 } from '~/utils/file'
 import { getHost } from '~/utils/config.env'
 import { MediaType } from '~/constants/enum'
-import { Media } from '~/models/Orther'
+import { Media } from '~/models/Other'
 import { encodeHLSWithMultipleVideoStreams } from '~/utils/video'
 import { LogError, LogInfo } from '~/utils/logger'
 
