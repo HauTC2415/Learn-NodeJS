@@ -60,11 +60,12 @@ export const logoutController = async (req: RequestBodyBase<LogoutRequestBody>, 
 
 export const refreshTokenController = async (req: RequestBodyBase<RefreshTokenRequestBody>, res: Response) => {
   const refresh_token = req.body.refresh_token
-  const { verify_status } = req.decoded_refresh_token as TokenPayload
-  const rs = await usersService.refreshToken({ refresh_token, verify_status })
+  const refresh_token_payload = req.decoded_refresh_token as TokenPayload
+
+  const result = await usersService.refreshToken({ refresh_token_payload, old_refresh_token: refresh_token })
   return res
     .status(HTTP_STATUS.OK)
-    .json(new ResponseBase<RefreshTokenResponse>(USER_MESSAGES.REFRESH_TOKEN_SUCCESS, rs))
+    .json(new ResponseBase<RefreshTokenResponse>(USER_MESSAGES.REFRESH_TOKEN_SUCCESS, result))
 }
 
 export const emailVerifyTokenController = async (req: RequestBodyBase<EmailVerifyTokenRequestBody>, res: Response) => {

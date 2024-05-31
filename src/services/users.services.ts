@@ -1,7 +1,11 @@
-import { unFollowUserController } from './../controllers/users.controllers'
 import User from '~/models/schemas/User.schema'
 import databaseService from './database.services'
-import { PayloadJwtToken, RegisterRequestBody, UpdateMeRequestBody } from '~/models/requests/User.requests'
+import {
+  PayloadJwtToken,
+  RegisterRequestBody,
+  TokenPayload,
+  UpdateMeRequestBody
+} from '~/models/requests/User.requests'
 import { hashPassword } from '~/utils/crypto'
 import { createJwtToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
@@ -135,16 +139,23 @@ class UsersService {
     await databaseService.refreshTokens.deleteOne({ token: refresh_token })
   }
 
-  async refreshToken({ refresh_token, verify_status }: { refresh_token: string; verify_status: UserVerifyStatus }) {
-    const old_refresh_token = (await databaseService.refreshTokens.findOne({ token: refresh_token })) as RefreshToken
-    const user_id = old_refresh_token.user_id.toString()
+  async refreshToken({
+    refresh_token_payload,
+    old_refresh_token
+  }: {
+    refresh_token_payload: TokenPayload
+    old_refresh_token: string
+  }) {
+    const { user_id, verify_status } = refresh_token_payload
 
-    const userRes = await this.userResponse({ user_id, verify_status })
-    const new_refresh_token = userRes.refresh_token
-
-    await this.saveRefreshToken(user_id, new_refresh_token)
-
-    return userRes
+    const [new_access_and_refresh_token, _] = await Promise.all([
+      this.userResponse({ user_id, verify_status }),
+      //delete old refresh token
+      databaseService.refreshTokens.deleteOne({ token: old_refresh_token })
+    ])
+    await this.saveRefreshToken(user_id, new_access_and_refresh_token.refresh_token)
+    const { refresh_token, access_token } = new_access_and_refresh_token
+    return { user_id, refresh_token, access_token }
   }
 
   async verifyEmail(user_id: string) {
