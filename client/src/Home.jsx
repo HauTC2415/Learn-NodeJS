@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import '@vidstack/react/player/styles/default/theme.css'
+import '@vidstack/react/player/styles/default/layouts/video.css'
+import { MediaPlayer, MediaProvider } from '@vidstack/react'
+import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default'
 
 const getGoogleAuthUrl = () => {
   const url = `https://accounts.google.com/o/oauth2/v2/auth`
@@ -51,10 +55,23 @@ export default function HomePage() {
           <Link to={googleOAuthUrl}>Login with Google</Link>
         )}
       </p>
+      <h2>Streaming Video</h2>
       <video controls width={500}>
         {/* <source src='http://localhost:4000/medias/videos/ce87c6f13a427e73b32fbb900.mp4' type='video/mp4' /> */}
-        <source src='http://localhost:4000/medias/videos-stream/ce87c6f13a427e73b32fbb900.mp4' type='video/mp4' />
+        <source src='http://localhost:4000/medias/videos-stream/8d2b8d9e8505c1a7afc4bfe05.mp4' type='video/mp4' />
       </video>
+      <h2>HLS Streaming Video</h2>
+      <MediaPlayer
+        playsInline
+        title='Sprite Fight'
+        src='http://localhost:4000/medias/videos-stream-hls/5tiCHJRikX_Wy-YpEHqRe/master.m3u8'
+      >
+        <MediaProvider />
+        <DefaultVideoLayout
+          // thumbnails='https://files.vidstack.io/sprite-fight/thumbnails.vtt'
+          icons={defaultLayoutIcons}
+        />
+      </MediaPlayer>
     </>
   )
 }
