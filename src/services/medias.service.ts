@@ -15,6 +15,45 @@ import { getHost } from '~/utils/config.env'
 import { MediaType } from '~/constants/enum'
 import { Media } from '~/models/Orther'
 import { encodeHLSWithMultipleVideoStreams } from '~/utils/video'
+import { LogError, LogInfo } from '~/utils/logger'
+
+class EncodeVideoHSLQueue {
+  private videoPaths: string[]
+  private isEncoding: boolean
+
+  constructor() {
+    this.videoPaths = []
+    this.isEncoding = false
+  }
+
+  pushIntoQueueAndProcess(videoPath: string) {
+    this.videoPaths.push(videoPath)
+    this.processEncode()
+  }
+
+  async processEncode() {
+    if (this.isEncoding) return
+    this.isEncoding = true
+    let videoPath: string | undefined
+    try {
+      while (this.videoPaths.length > 0) {
+        videoPath = this.videoPaths.shift()
+        if (videoPath) {
+          await encodeHLSWithMultipleVideoStreams(videoPath)
+          await fsPromises.unlink(videoPath) //remove file .mp4
+          LogInfo(`=====> Encode video ${videoPath} success!`)
+        }
+      }
+      LogInfo('=====> Encode all videos success!')
+    } catch (error) {
+      LogError(`===> Encode video ${videoPath} error: ${error}`)
+    } finally {
+      this.isEncoding = false
+    }
+  }
+}
+
+const encodeVideoHSLQueue = new EncodeVideoHSLQueue()
 
 class MediasService {
   async uploadSingleImage(req: Request) {
@@ -75,10 +114,11 @@ class MediasService {
     const files = await handleUploadVideoHLS(req)
     const result: Media[] = await Promise.all(
       files.map(async (file) => {
-        await encodeHLSWithMultipleVideoStreams(file.filepath)
         const { newFilename, filepath } = file
+        encodeVideoHSLQueue.pushIntoQueueAndProcess(filepath)
+        // await encodeHLSWithMultipleVideoStreams(file.filepath)
+        // await fsPromises.unlink(filepath) //remove file .mp4
         const path = getNameFromFullName(newFilename)
-        await fsPromises.unlink(filepath) //remove file .mp4
         return {
           url: `${getHost}${PATHS.PREFIX_MEDIA}${PATHS.SERVE_VIDEOS}-stream-hls/${path}/master.m3u8`,
           type: MediaType.VIDEO_HLS
