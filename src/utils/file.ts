@@ -17,7 +17,7 @@ const initFolder = (folderPath: string) => {
 
 export const initUploadsTempFolder = () => {
   initFolder(PATHS.UPLOADS_IMAGE_TEMP) //create folder uploads/images/temp
-  initFolder(PATHS.UPLOADS_VIDEO_TEMP) //create folder uploads/videos/temp
+  initFolder(PATHS.UPLOADS_VIDEO) //create folder uploads/videos/temp
 }
 
 export const handleUploadSingleImage = async (req: Request): Promise<File> => {
@@ -48,11 +48,11 @@ export const handleUploadSingleImage = async (req: Request): Promise<File> => {
   return new Promise<File>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
-        reject(new DefaultError({ message: err.message, status: HTTP_STATUS.BAD_REQUEST }))
+        return reject(new DefaultError({ message: err.message, status: HTTP_STATUS.BAD_REQUEST }))
       }
       const fileIsEmpty = Object.keys(files).length === 0
       if (fileIsEmpty) {
-        reject(
+        return reject(
           new DefaultError({ message: MEDIA_MESSAGES.FILE_IS_REQUIRE_CAN_NOT_NULL, status: HTTP_STATUS.BAD_REQUEST })
         )
       }
@@ -90,12 +90,12 @@ export const handleUploadMultiImages = async (req: Request): Promise<File[]> => 
   return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
-        reject(new DefaultError({ message: err.message, status: HTTP_STATUS.BAD_REQUEST }))
+        return reject(new DefaultError({ message: err.message, status: HTTP_STATUS.BAD_REQUEST }))
       }
 
       const fileIsEmpty = Object.keys(files).length === 0
       if (fileIsEmpty) {
-        reject(
+        return reject(
           new DefaultError({ message: MEDIA_MESSAGES.FILE_IS_REQUIRE_CAN_NOT_NULL, status: HTTP_STATUS.BAD_REQUEST })
         )
       }
@@ -108,7 +108,7 @@ export const handleUploadVideo = async (req: Request) => {
   const MAX_FILES = 1
   const form = formidable({
     multiples: true,
-    uploadDir: PATHS.UPLOADS_VIDEO_TEMP,
+    uploadDir: PATHS.UPLOADS_VIDEO,
     // keepExtensions: true,
     maxFiles: MAX_FILES,
     maxTotalFileSize: 500 * 1024 * 1024 * MAX_FILES, //500MB * MAX_FILES
@@ -155,7 +155,80 @@ export const handleUploadVideo = async (req: Request) => {
         const newFilepath = `${video.filepath}.${extensionsFile}`
         //update filepath
         fs.renameSync(video.filepath, newFilepath)
-        //update newFilename
+        //update filepath, newFilename + extension
+        video.filepath = video.filepath + '.' + extensionsFile
+        video.newFilename = video.newFilename + '.' + extensionsFile
+      })
+      resolve(files.video as File[])
+    })
+  })
+}
+
+// Handle upload video with HLS format
+// Have 2 steps:
+// 1. upload video: Upload video to server success then return to user
+// 2. encode video to HLS format: define 1 URL endpoint to check status of encoding
+export const handleUploadVideoHLS = async (req: Request) => {
+  const MAX_FILES = 1
+  const nanoId = (await import('nanoid')).nanoid
+  const idName = nanoId()
+  const pathWidthId = PATHS.UPLOADS_VIDEO + '/' + idName
+  initFolder(pathWidthId)
+  const form = formidable({
+    multiples: true,
+    uploadDir: pathWidthId,
+    // keepExtensions: true,
+    maxFiles: MAX_FILES,
+    maxTotalFileSize: 500 * 1024 * 1024 * MAX_FILES, //500MB * MAX_FILES
+    filter: function ({ name, mimetype }) {
+      const extensions = ['mp4', 'quicktime']
+      const isCorrectType = extensions.some((ext) => Boolean(mimetype?.includes(ext)))
+      const isCorrectFieldName = name === 'video'
+      const isValid = isCorrectType && isCorrectFieldName
+      if (!isValid) {
+        form.emit(
+          'error' as any,
+          new DefaultError({
+            message: MEDIA_MESSAGES.INVALID_UPLOAD_MULTI_IMAGES_TYPE,
+            status: HTTP_STATUS.BAD_REQUEST
+          }) as any
+        )
+      }
+      return isValid
+    },
+    filename: function () {
+      return idName
+    }
+  })
+  return new Promise<File[]>((resolve, reject) => {
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        return reject(err)
+      }
+
+      const fileIsEmpty = Object.keys(files).length === 0
+      if (fileIsEmpty) {
+        return reject(
+          new DefaultError({ message: MEDIA_MESSAGES.FILE_IS_REQUIRE_CAN_NOT_NULL, status: HTTP_STATUS.BAD_REQUEST })
+        )
+      }
+
+      //rename filepath and newFilename, because not use keepExtensions: true.
+      // filepath: ~/abc => ~/abc.mp4
+      // newFilename: abc => abc.mp4
+      const videos = files.video as File[]
+      if (videos === undefined || videos.length === 0)
+        return reject(
+          new DefaultError({ message: MEDIA_MESSAGES.FILE_IS_REQUIRE_CAN_NOT_NULL, status: HTTP_STATUS.BAD_REQUEST })
+        )
+      videos.forEach((video) => {
+        const originalFilename = video.originalFilename as string
+        const extensionsFile = getExtensionFromFullName(originalFilename)
+        const newFilepath = `${video.filepath}.${extensionsFile}`
+        //update filepath
+        fs.renameSync(video.filepath, newFilepath)
+        //update filepath, newFilename + extension
+        video.filepath = video.filepath + '.' + extensionsFile
         video.newFilename = video.newFilename + '.' + extensionsFile
       })
       resolve(files.video as File[])

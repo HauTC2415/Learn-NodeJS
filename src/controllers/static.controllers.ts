@@ -23,7 +23,7 @@ export const serveVideoStreamController = async (req: Request, res: Response) =>
     return res.status(HTTP_STATUS.BAD_REQUEST).send(MEDIA_MESSAGES.REQUIRES_RANGE_HEADER)
   }
   const { filename } = req.params
-  const videoPath = PATHS.UPLOADS_VIDEO_TEMP + '/' + filename
+  const videoPath = PATHS.UPLOADS_VIDEO + '/' + filename
   //1MB = 10^6 bytes, calculator hệ 10. It
   //1MB = 2^20 bytes (1024 * 1024), calculator hệ 2
 
@@ -78,4 +78,27 @@ export const serveVideoStreamController = async (req: Request, res: Response) =>
   res.writeHead(HTTP_STATUS.PARTIAL_CONTENT, headers)
   const videoStreams = fs.createReadStream(videoPath, { start, end })
   videoStreams.pipe(res)
+}
+
+export const serveVideoM3U8Controller = async (req: Request, res: Response) => {
+  const { id } = req.params
+  const m3u8_file = 'master.m3u8'
+  const file_path = PATHS.UPLOADS_VIDEO + '/' + id + '/' + m3u8_file
+  return res.sendFile(file_path, (error) => {
+    if (error) {
+      const rsError = omit(error, 'path')
+      res.status((error as any).status).json(new ResponseBase(MEDIA_MESSAGES.FILE_NOT_FOUND, { rsError }))
+    }
+  })
+}
+
+export const serveVideoSegmentController = async (req: Request, res: Response) => {
+  const { id, v, segment } = req.params
+  const file_path = PATHS.UPLOADS_VIDEO + '/' + id + '/' + v + '/' + segment
+  return res.sendFile(file_path, (error) => {
+    if (error) {
+      const rsError = omit(error, 'path')
+      res.status((error as any).status).json(new ResponseBase(MEDIA_MESSAGES.FILE_NOT_FOUND, { rsError }))
+    }
+  })
 }
