@@ -78,10 +78,4 @@ export const serveVideoStreamController = async (req: Request, res: Response) =>
   res.writeHead(HTTP_STATUS.PARTIAL_CONTENT, headers)
   const videoStreams = fs.createReadStream(videoPath, { start, end })
   videoStreams.pipe(res)
-  // return res.sendFile(PATHS.UPLOADS_VIDEO + '/' + filename, (error) => {
-  // return res.sendFile(PATHS.UPLOADS_VIDEO_TEMP + '/' + filename, (error) => {
-  //   if (error) {
-  //     console.log('error', error)
-  //   }
-  // })
 }
