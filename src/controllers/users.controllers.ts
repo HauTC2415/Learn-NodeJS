@@ -71,7 +71,6 @@ export const refreshTokenController = async (req: RequestBodyBase<RefreshTokenRe
 export const emailVerifyTokenController = async (req: RequestBodyBase<EmailVerifyTokenRequestBody>, res: Response) => {
   const decoded_email_verify_token = req.decoded_email_verify_token
   const user_id = decoded_email_verify_token?.user_id as string
-  console.log('decoded_email_verify_token', decoded_email_verify_token)
   const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
   if (!user) {
     throw new DefaultError({ message: USER_MESSAGES.NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
