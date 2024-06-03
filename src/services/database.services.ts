@@ -40,6 +40,12 @@ class DatabaseService {
     console.log('disconnected')
   }
 
+  createIndexesUsers() {
+    this.users.createIndex({ email: 1 }, { unique: true })
+    this.users.createIndex({ username: 1 }, { unique: true })
+    this.users.createIndex({ username: 1, password: 1 })
+  }
+
   //get collection users
   get users(): Collection<User> {
     return this.db.collection(getEnv.DB_USERS_COLLECTION as string)

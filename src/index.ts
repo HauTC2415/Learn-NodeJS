@@ -39,7 +39,12 @@ app.use(`${PATHS.PREFIX_MEDIA}${PATHS.SERVE_VIDEOS}`, express.static(PATHS.UPLOA
 app.use(PATHS.PREFIX_MEDIA, staticRouter) // have serve video stream, demo video stream in client side (Home.tsx)
 
 //run mongoDB
-databaseService.connect().catch(console.dir)
+databaseService
+  .connect()
+  .then(() => {
+    databaseService.createIndexesUsers()
+  })
+  .catch(console.dir)
 
 //app error handler
 //level higher than routes in app
