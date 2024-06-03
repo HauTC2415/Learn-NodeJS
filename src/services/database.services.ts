@@ -3,6 +3,7 @@ import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Follow from '~/models/schemas/Follower.schema'
 import { getEnv } from '~/utils/config.env'
+import VideoStatus from '~/models/schemas/VideoStatus.schema'
 
 const uri = `mongodb+srv://${getEnv.DB_USERNAME}:${getEnv.BD_PASSWORD}@twitter.wtyiuov.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 // const client = new MongoClient(uri, {
@@ -51,6 +52,11 @@ class DatabaseService {
   //get collection followers
   get followers(): Collection<Follow> {
     return this.db.collection(getEnv.DB_FOLLOWERS_COLLECTION as string)
+  }
+
+  //get collection videoStatus
+  get videoStatus(): Collection<VideoStatus> {
+    return this.db.collection(getEnv.DB_VIDEO_STATUS_COLLECTION as string)
   }
 }
 
