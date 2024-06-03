@@ -34,18 +34,28 @@ function LogCommon({ msg, foreground = '', background = '' }: LogProps) {
     cyan: '6'
   }
 
-  let foreStringGround = ''
-  let backStringGround = ''
+  let foregroundString = ''
+  let backgroundString = ''
   const foregroundCode = ColorCodes[foreground as keyof typeof ColorCodes]
   const backgroundCode = ColorCodes[background as keyof typeof ColorCodes]
 
   if (foreground && foregroundCode) {
-    foreStringGround = PfxCodVar + '3' + foregroundCode + 'm'
+    foregroundString = PfxCodVar + '3' + foregroundCode + 'm'
   }
   if (background && backgroundCode) {
-    backStringGround = PfxCodVar + '4' + backgroundCode + 'm'
+    backgroundString = PfxCodVar + '4' + backgroundCode + 'm'
   }
-  console.log(foreStringGround, backStringGround, msg, ClrCodVar)
+
+  const logDate = new Date().toLocaleString()
+  const startLog = '>>>>>>>>>> S T A R T _ L O G >>>>>>>>>>'
+  const endLog = '>>>>>>>>>> E N D _ L O G >>>>>>>>>>'
+  const logMsg = `LOG_DATE: ${logDate}\n  MESSAGE: ${msg}`
+  const foreString = COLOR_STRING.cyan
+  const foreCode = ColorCodes[foreString as keyof typeof ColorCodes]
+  const foregroundStringLog = PfxCodVar + '3' + foreCode + 'm'
+  console.log(foregroundStringLog, backgroundString, startLog, ClrCodVar)
+  console.log(foregroundString, backgroundString, logMsg, ClrCodVar)
+  console.log(foregroundStringLog, backgroundString, endLog, ClrCodVar)
 }
 
 export const LogError = (msg: any) => {

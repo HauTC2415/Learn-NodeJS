@@ -41,12 +41,12 @@ class EncodeVideoHSLQueue {
         if (videoPath) {
           await encodeHLSWithMultipleVideoStreams(videoPath)
           await fsPromises.unlink(videoPath) //remove file .mp4
-          LogInfo(`=====> Encode video ${videoPath} success!`)
+          LogInfo(`Encode video ${videoPath} success!`)
         }
       }
-      LogInfo('=====> Encode all videos success!')
+      LogInfo('Encode all videos success!')
     } catch (error) {
-      LogError(`===> Encode video ${videoPath} error: ${error}`)
+      LogError(`Encode video ${videoPath} error: ${error}`)
     } finally {
       this.isEncoding = false
     }
