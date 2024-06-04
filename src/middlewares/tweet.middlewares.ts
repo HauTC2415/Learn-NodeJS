@@ -70,8 +70,6 @@ export const createTweetValidator = validate(
               })
             }
             //if type is not retweet && hashtags and mentions empty, content must be not empty
-            LogInfo(isEmpty(mentions))
-            LogInfo(mentions)
             const hasContentAndMoreCondition =
               value !== '' && type !== TweetType.Retweet && isEmpty(mentions) && isEmpty(hashtags)
             if (!hasContentAndMoreCondition) {
