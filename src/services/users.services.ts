@@ -7,7 +7,7 @@ import {
   UpdateMeRequestBody
 } from '~/models/requests/User.requests'
 import { hashPassword } from '~/utils/crypto'
-import { createJwtToken } from '~/utils/jwt'
+import { createJwtToken, verifyJwtToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
@@ -22,12 +22,29 @@ class UsersService {
       tokenType: TokenType.ACCESS_TOKEN
     })
   }
-  private signRefreshToken({ user_id, verify_status }: { user_id: string; verify_status: UserVerifyStatus }) {
-    const _payload: PayloadJwtToken = { user_id, token_type: TokenType.REFRESH_TOKEN, verify_status }
-    return createJwtToken({
-      payload: _payload,
-      tokenType: TokenType.REFRESH_TOKEN
-    })
+
+  private signRefreshToken({
+    user_id,
+    verify_status,
+    exp
+  }: {
+    user_id: string
+    verify_status: UserVerifyStatus
+    exp?: number
+  }) {
+    if (exp) {
+      const _payload: PayloadJwtToken = { user_id, token_type: TokenType.REFRESH_TOKEN, verify_status, exp }
+      return createJwtToken({
+        payload: _payload,
+        tokenType: TokenType.REFRESH_TOKEN
+      })
+    } else {
+      const _payload: PayloadJwtToken = { user_id, token_type: TokenType.REFRESH_TOKEN, verify_status }
+      return createJwtToken({
+        payload: _payload,
+        tokenType: TokenType.REFRESH_TOKEN
+      })
+    }
   }
 
   private signEmailVerifyToken({ user_id, verify_status }: { user_id: string; verify_status: UserVerifyStatus }) {
@@ -48,26 +65,30 @@ class UsersService {
 
   public async signAccessTokenAndRefreshToken({
     user_id,
-    verify_status
+    verify_status,
+    exp
   }: {
     user_id: string
     verify_status: UserVerifyStatus
+    exp?: number
   }) {
     const [access_token, refresh_token] = await Promise.all([
       this.signAccessToken({ user_id, verify_status }),
-      this.signRefreshToken({ user_id, verify_status })
+      this.signRefreshToken({ user_id, verify_status, exp })
     ])
     return { access_token, refresh_token }
   }
 
   private async userResponse({
     user_id,
-    verify_status = UserVerifyStatus.UNVERIFIED
+    verify_status = UserVerifyStatus.UNVERIFIED,
+    exp
   }: {
     user_id: string
     verify_status?: UserVerifyStatus
+    exp?: number
   }) {
-    const { access_token, refresh_token } = await this.signAccessTokenAndRefreshToken({ user_id, verify_status })
+    const { access_token, refresh_token } = await this.signAccessTokenAndRefreshToken({ user_id, verify_status, exp })
     return {
       user_id,
       access_token,
@@ -84,10 +105,19 @@ class UsersService {
     await databaseService.refreshTokens.deleteOne({ user_id: new ObjectId(user_id) })
   }
 
+  private decodeRefreshToken(refresh_token: string) {
+    return verifyJwtToken(refresh_token, TokenType.REFRESH_TOKEN)
+  }
   public async saveRefreshToken(user_id: string, refresh_token: string) {
     const oldRefreshToken = await this.getOldRefreshToken(user_id)
     if (oldRefreshToken) await this.deleteOldRefreshToken(user_id)
-    const refreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+    const { iat, exp } = await this.decodeRefreshToken(refresh_token)
+    const refreshToken = new RefreshToken({
+      user_id: new ObjectId(user_id),
+      token: refresh_token,
+      iat: iat as number,
+      exp: exp as number
+    })
     await databaseService.refreshTokens.insertOne(refreshToken)
   }
 
@@ -146,13 +176,14 @@ class UsersService {
     refresh_token_payload: TokenPayload
     old_refresh_token: string
   }) {
-    const { user_id, verify_status } = refresh_token_payload
+    const { user_id, verify_status, exp } = refresh_token_payload
 
     const [new_access_and_refresh_token, _] = await Promise.all([
-      this.userResponse({ user_id, verify_status }),
+      this.userResponse({ user_id, verify_status, exp }),
       //delete old refresh token
       databaseService.refreshTokens.deleteOne({ token: old_refresh_token })
     ])
+
     await this.saveRefreshToken(user_id, new_access_and_refresh_token.refresh_token)
     const { refresh_token, access_token } = new_access_and_refresh_token
     return { user_id, refresh_token, access_token }

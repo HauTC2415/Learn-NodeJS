@@ -6,6 +6,7 @@ export interface PayloadJwtToken {
   user_id: string
   token_type: TokenType
   verify_status: UserVerifyStatus
+  exp?: number
 }
 
 //take note: extend "JwtPayload" and "PayloadJwtToken"
@@ -13,6 +14,7 @@ export interface TokenPayload extends JwtPayload {
   user_id: string
   token_type: TokenType
   verify_status: UserVerifyStatus
+  exp?: number
 }
 
 export interface RegisterRequestBody {

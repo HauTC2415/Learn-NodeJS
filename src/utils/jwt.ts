@@ -51,8 +51,19 @@ const getSecretKey = (tokenType: TokenType) => {
 }
 
 export const createJwtToken = async ({ payload, tokenType }: { payload: PayloadJwtToken; tokenType: TokenType }) => {
-  const expires = getExpiresAt(tokenType)
   const secret_key = getSecretKey(tokenType)
+  const { exp } = payload
+  //create new REFRESH_TOKEN with old expires
+  if (exp && tokenType === TokenType.REFRESH_TOKEN) {
+    return await signToken({
+      payload,
+      secret_key: secret_key as string,
+      options: {
+        algorithm: getEnv.ALGORITHM as jwt.Algorithm
+      }
+    })
+  }
+  const expires = getExpiresAt(tokenType)
   return await signToken({
     payload,
     secret_key: secret_key as string,
