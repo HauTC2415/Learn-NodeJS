@@ -17,7 +17,6 @@ import {
   passwordSchema
 } from './common/param.schema.validator'
 import { TokenPayload } from '~/models/requests/User.requests'
-import { ObjectId } from 'mongodb'
 import { REGEX_USERNAME } from '~/constants/regex'
 import { hashPassword } from '~/utils/crypto'
 
