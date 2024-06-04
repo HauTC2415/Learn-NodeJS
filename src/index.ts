@@ -43,6 +43,9 @@ databaseService
   .connect()
   .then(() => {
     databaseService.createIndexesUsers()
+    databaseService.createIndexesRefreshTokens()
+    databaseService.createIndexesFollowers()
+    databaseService.createIndexesVideoStatus()
   })
   .catch(console.dir)
 
