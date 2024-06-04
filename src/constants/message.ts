@@ -69,5 +69,23 @@ const MEDIA_MESSAGES = {
   INSERT_DB_ERROR: 'Insert video status to DB error'
 } as const
 
-export { MEDIA_MESSAGES }
+const TWEET_MESSAGES = {
+  CREATE_TWEET_SUCCESS: 'Tweet created successfully!',
+  CREATE_TWEET_FAILED: 'Tweet creation failed',
+  TWEET_INVALID: 'Invalid tweet type',
+  AUDIENCE_INVALID: 'Invalid audience type',
+  CONTENT_INVALID_MUST_BE_STRING: 'Content must be a string',
+  PARENT_ID_MUST_BE_A_VALID_TWEET_ID: 'Parent id must be a valid tweet id',
+  PARENT_ID_MUST_BE_NULL: 'Parent id must be null, this is root tweet type so not have parent id',
+  CONTENT_MUST_BE_EMPTY: 'Content must be empty, this is retweet type so not have content',
+  CONTENT_IS_REQUIRED_OR_MUST_BE_STRING: 'Content is required or must be a string',
+  HASHTAGS_MUST_BE_ARRAY: 'Hashtags must be an array',
+  MENTIONS_MUST_BE_ARRAY: 'Mentions must be an array',
+  HASHTAGS_MUST_BE_ARRAY_STRING: 'Hashtags must be an array of string',
+  MENTIONS_MUST_BE_ARRAY_OF_USER_ID: 'Mentions must be an array of user id',
+  MEDIAS_MUST_BE_ARRAY: 'Medias must be an array',
+  MEDIAS_MUST_BE_ARRAY_OF_MEDIA_TYPE: 'Medias must be an array of media type'
+}
+
+export { MEDIA_MESSAGES, TWEET_MESSAGES }
 export default USER_MESSAGES

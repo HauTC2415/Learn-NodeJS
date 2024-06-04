@@ -9,6 +9,7 @@ import { getEnv } from './utils/config.env'
 import PATHS from './constants/paths'
 import staticRouter from './routes/static.routes'
 import cors from 'cors'
+import tweetRouter from './routes/tweet.routes'
 
 const app = express()
 const PORT = getEnv.PORT as string | 4000
@@ -29,7 +30,7 @@ app.get('/', (req, res) => {
 app.use('/users', usersRouter) //has to be /user/profile
 app.use('/api', oAuthRouter)
 app.use('/medias', mediasRouter)
-
+app.use('/tweets', tweetRouter)
 //serve static files
 // app.use(express.static(PATHS.UPLOADS_IMAGE))
 //=> http://localhost:4000/aa3ed3b0dc3a9566305aa3600.jpeg
@@ -46,6 +47,7 @@ databaseService
     databaseService.createIndexesRefreshTokens()
     databaseService.createIndexesFollowers()
     databaseService.createIndexesVideoStatus()
+    databaseService.createIndexesTweets()
   })
   .catch(console.dir)
 

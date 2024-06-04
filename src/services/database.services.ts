@@ -5,6 +5,7 @@ import Follow from '~/models/schemas/Follower.schema'
 import { getEnv } from '~/utils/config.env'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
 import { LogInfo } from '~/utils/logger'
+import Tweet from '~/models/schemas/Tweet.schema'
 
 const uri = `mongodb+srv://${getEnv.DB_USERNAME}:${getEnv.BD_PASSWORD}@twitter.wtyiuov.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 // const client = new MongoClient(uri, {
@@ -69,6 +70,11 @@ class DatabaseService {
     this.videoStatus.createIndex({ name: 1 })
     this.videoStatus.createIndex({ status: 1 })
   }
+
+  async createIndexesTweets() {
+    // #TODO
+  }
+
   //#endregion END CREATE INDEXES
 
   //#region GET COLLECTIONS
@@ -90,6 +96,12 @@ class DatabaseService {
   get videoStatus(): Collection<VideoStatus> {
     return this.db.collection(getEnv.DB_VIDEO_STATUS_COLLECTION as string)
   }
+
+  //get collection tweet
+  get tweets(): Collection<Tweet> {
+    return this.db.collection(getEnv.DB_TWEETS_COLLECTION as string)
+  }
+
   //#endregion END GET COLLECTIONS
 }
 
