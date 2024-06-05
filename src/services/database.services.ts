@@ -6,6 +6,7 @@ import { getEnv } from '~/utils/config.env'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
 import { LogInfo } from '~/utils/logger'
 import Tweet from '~/models/schemas/Tweet.schema'
+import Hashtag from '~/models/schemas/Hashtag.schema'
 
 const uri = `mongodb+srv://${getEnv.DB_USERNAME}:${getEnv.BD_PASSWORD}@twitter.wtyiuov.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 // const client = new MongoClient(uri, {
@@ -81,6 +82,12 @@ class DatabaseService {
     this.tweets.createIndex({ hashtags: 1 })
   }
 
+  async createIndexesHashtags() {
+    const exist = await this.hashtags.indexExists(['name_1'])
+    if (exist) return
+    this.hashtags.createIndex({ name: 1 })
+  }
+
   //#endregion END CREATE INDEXES
 
   //#region GET COLLECTIONS
@@ -106,6 +113,11 @@ class DatabaseService {
   //get collection tweet
   get tweets(): Collection<Tweet> {
     return this.db.collection(getEnv.DB_TWEETS_COLLECTION as string)
+  }
+
+  //get collection hashtags
+  get hashtags(): Collection<Hashtag> {
+    return this.db.collection(getEnv.DB_HASHTAGS_COLLECTION as string)
   }
 
   //#endregion END GET COLLECTIONS

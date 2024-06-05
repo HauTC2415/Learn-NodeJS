@@ -6,7 +6,6 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import { TWEET_MESSAGES } from '~/constants/message'
 import { DefaultError } from '~/models/Errors'
 import { numberEnumToArray } from '~/utils/common'
-import { LogInfo } from '~/utils/logger'
 import { validate } from '~/utils/validation'
 
 const tweetTypes = numberEnumToArray(TweetType)
@@ -70,9 +69,9 @@ export const createTweetValidator = validate(
               })
             }
             //if type is not retweet && hashtags and mentions empty, content must be not empty
-            const hasContentAndMoreCondition =
+            const contentEmptyAndMoreCondition =
               value !== '' && type !== TweetType.Retweet && isEmpty(mentions) && isEmpty(hashtags)
-            if (!hasContentAndMoreCondition) {
+            if (contentEmptyAndMoreCondition) {
               throw new DefaultError({
                 message: TWEET_MESSAGES.CONTENT_IS_REQUIRED_OR_MUST_BE_STRING,
                 status: HTTP_STATUS.BAD_REQUEST

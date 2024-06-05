@@ -48,6 +48,7 @@ databaseService
     databaseService.createIndexesFollowers()
     databaseService.createIndexesVideoStatus()
     databaseService.createIndexesTweets()
+    databaseService.createIndexesHashtags()
   })
   .catch(console.dir)
 
