@@ -72,7 +72,13 @@ class DatabaseService {
   }
 
   async createIndexesTweets() {
-    // #TODO
+    const exist = await this.tweets.indexExists(['type_1', 'audience_1', 'parent_id_1', 'mentions_1', 'hashtags_1'])
+    if (exist) return
+    this.tweets.createIndex({ type: 1 })
+    this.tweets.createIndex({ audience: 1 })
+    this.tweets.createIndex({ parent_id: 1 })
+    this.tweets.createIndex({ mentions: 1 })
+    this.tweets.createIndex({ hashtags: 1 })
   }
 
   //#endregion END CREATE INDEXES
